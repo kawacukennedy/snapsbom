@@ -80,3 +80,13 @@ MIT. See [LICENSE](./LICENSE).
 ## Acknowledgments
 
 Built with Rust, focused on simplicity, correctness, and developer experience.
+
+## Demo
+
+See SnapSBOM in action - deterministic SBOMs in milliseconds.
+
+```bash
+npx snapsbom .
+```
+
+[View demo on landing page](https://kawacukennedy.github.io/snapsbom/)
