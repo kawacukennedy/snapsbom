@@ -9,7 +9,7 @@ SnapSBOM generates deterministic [SBOMs](https://www.cisa.gov/resources-tools/re
 [![WASM Ready](https://img.shields.io/badge/WASM-ready-654FF0.svg)](https://webassembly.org/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 
-## ✨ Features
+##  Features
 
 - **Lightning fast**: Generates SBOMs in milliseconds, even for large projects
 - **Truly local-first**: Zero network calls, zero telemetry, zero tracking. Works fully offline and in air-gapped environments.
@@ -18,7 +18,7 @@ SnapSBOM generates deterministic [SBOMs](https://www.cisa.gov/resources-tools/re
 - **Standards compliant**: Outputs [SPDX 2.3](https://spdx.github.io/spdx-spec/v2.3/) and [CycloneDX 1.6](https://cyclonedx.org/specification/overview/) JSON.
 - **Minimal & focused**: Analyzes lockfiles for accuracy with no heavy filesystem scanning. Fast, simple, and reliable.
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### CLI (recommended)
 
@@ -50,26 +50,26 @@ snapsbom . --format cyclonedx
 snapsbom . > sbom.spdx.json
 ```
 
-## 🎯 Why Determinism Matters
+##  Why Determinism Matters
 
 Most SBOM tools produce slightly different output each run (different ordering, formatting). SnapSBOM guarantees byte-for-byte identical output for the same input across different machines, OSes, and runtimes. This is essential for:
 - **Supply chain verification**: Reproducible builds and artifact attestation
 - **Compliance**: Auditable, diffable SBOMs for regulations like the [EU Cyber Resilience Act (CRA)](https://digital-strategy.ec.europa.eu/en/library/cyber-resilience-act)
 - **Trust**: Content hashes match regardless of where generation happens
 
-## 🤝 Contributing
+##  Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
-## 📄 License
+##  License
 
 MIT License - see [LICENSE](./LICENSE) for details.
 
-## ⭐ Star History
+##  Star History
 
 If SnapSBOM helps you, please consider starring the repo to help others discover it!
 
-## 📈 Roadmap
+##  Roadmap
 
 - [x] Core engine & deterministic serialization
 - [ ] npm/pnpm/yarn lockfile parsers
@@ -80,11 +80,11 @@ If SnapSBOM helps you, please consider starring the repo to help others discover
 - [ ] GitHub Actions integration
 - [ ] Content hash verification
 
-## 💬 Community
+##  Community
 
 - [Discussions](https://github.com/kawacukennedy/snapsbom/discussions) - Ask questions, share ideas
 - [Issues](https://github.com/kawacukennedy/snapsbom/issues) - Report bugs or request features
 
-## 🙌 Acknowledgments
+##  Acknowledgments
 
 Built with Rust, WASM, and a focus on developer UX. Inspired by the need for simple, trustworthy SBOM tooling in the age of AI and increasing compliance requirements.
