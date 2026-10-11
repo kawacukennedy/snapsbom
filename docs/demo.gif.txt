@@ -1,0 +1,3 @@
+Demo GIF placeholder - record with asciinema/terminalizer later:
+Terminal command: npx snapsbom .
+Output: deterministic SPDX JSON in milliseconds
