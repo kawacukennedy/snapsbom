@@ -1,72 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SnapSBOM - Deterministic SBOMs in a snap</title>
-  <meta name="description" content="Deterministic SBOM generator that runs in CLI and WASM with zero cloud, zero friction." />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnapSBOM - Deterministic SBOM Generator</title>
+  <meta name="description" content="Deterministic SBOM generator. Generate SPDX and CycloneDX SBOMs instantly from lockfiles. Runs locally in CLI and browser. Zero cloud.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --bg:#0f172a; --fg:#e2e8f0; --primary:#3b82f6; --muted:#94a3b8; }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--fg);line-height:1.6}
-    header{padding:4rem 1rem;text-align:center;background:linear-gradient(180deg,#0f172a 0%,#1e293b 100%)}
-    .container{max-width:960px;margin:0 auto;padding:0 1rem}
-    h1{font-size:3rem;margin-bottom:.5rem}
-    .tagline{color:var(--muted);font-size:1.25rem;margin-bottom:2rem}
-    .btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
-    .btn{padding:.75rem 1.5rem;border-radius:.5rem;text-decoration:none;border:1px solid transparent}
-    .btn-primary{background:var(--primary);color:#fff}
-    .btn-secondary{border-color:#475569;color:var(--fg)}
-    section{padding:3rem 1rem}
-    .grid{display:grid;gap:2rem;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
-    .card{padding:1.5rem;border:1px solid #334155;border-radius:.75rem;background:#1e293b}
-    pre{background:#0f172a;padding:1rem;border-radius:.5rem;overflow:auto;border:1px solid #334155}
-    footer{text-align:center;padding:2rem;color:var(--muted);border-top:1px solid #334155}
-    code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,sans-serif}
+    :root{--bg:#0b1026;--card:#121a2f;--border:#1e2a45;--text:#e6e8ee;--muted:#9aa0c3;--primary:#4f9deb;--success:#22c55e;--code:#0f1529}
+    body{background:radial-gradient(1200px 800px at 80% -20%,#16204a 0%,var(--bg) 55%);color:var(--text);line-height:1.7;font-size:16px}
+    header{padding:32px 20px 0}
+    nav{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;gap:12px;align-items:center;text-decoration:none;color:var(--text)}
+    .logo-badge{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#4f9deb,#2563eb);box-shadow:0 10px 30px -10px rgba(79,157,235,.7);display:grid;place-items:center}
+    .links{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+    .link{color:var(--muted);text-decoration:none;font-weight:500}
+    .link:hover{color:var(--text)}
+    .btn{padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:600}
+    .btn-ghost{color:var(--text);border:1px solid var(--border)}
+    .hero{max-width:1100px;margin:60px auto 0;padding:0 20px;text-align:center}
+    .eyebrow{color:var(--primary);font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:12px;margin-bottom:16px}
+    h1{font-size:clamp(2.2rem,6vw,4.2rem);line-height:1.08;margin-bottom:16px;font-weight:700}
+    .sub{color:var(--muted);max-width:720px;margin:0 auto 28px;font-size:clamp(1rem,2vw,1.12rem)}
+    .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    .btn-primary{background:linear-gradient(135deg,#4f9deb,#2563eb);color:#fff;box-shadow:0 20px 40px -20px rgba(37,99,235,.9)}
+    .btn-secondary{color:var(--text);border:1px solid var(--border);background:transparent}
+    .panel{max-width:1100px;margin:40px auto;padding:0 20px}
+    .code{background:linear-gradient(180deg,rgba(79,157,235,.12),transparent 60%),var(--code);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 60px 120px -80px rgba(79,157,235,.4)}
+    .code-head{display:flex;gap:10px;padding:16px 18px;border-bottom:1px solid var(--border)}
+    .dot{width:10px;height:10px;border-radius:50%;background:#334155}
+    .dot:nth-child(2){background:#475569}
+    .dot:nth-child(3){background:#64748b}
+    pre{padding:22px 18px;overflow:auto;color:var(--text);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px}
+    .grid{max-width:1100px;margin:60px auto;padding:0 20px;display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--card);border:1px solid var(--border);border-radius:14px;padding:22px}
+    .card h3{margin-bottom:8px;font-size:18px}
+    .card p{color:var(--muted)}
+    footer{margin:60px auto 30px;text-align:center;color:var(--muted)}
+    a{color:inherit}
   </style>
 </head>
 <body>
   <header>
-    <div class="container">
-      <h1>SnapSBOM</h1>
-      <p class="tagline">SBOMs in a snap. No cloud. No friction.</p>
-      <div class="btns">
-        <a class="btn btn-primary" href="https://github.com/kawacukennedy/snapsbom">View on GitHub</a>
-        <a class="btn btn-secondary" href="#demo">Try Demo</a>
-        <a class="btn btn-secondary" href="https://github.com/kawacukennedy/snapsbom#quick-start">Get Started</a>
+    <nav>
+      <a class="logo" href="/">
+        <div class="logo-badge">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="10" stroke="white" stroke-width="1.6"/><path d="M6.5 11.5L9 14L15.5 8" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div><div style="font-weight:700">SnapSBOM</div><div style="font-size:12px;color:var(--muted)">Deterministic SBOM Generator</div></div>
+      </a>
+      <div class="links">
+        <a class="link" href="https://github.com/kawacukennedy/snapsbom">GitHub</a>
+        <a class="link" href="https://www.npmjs.com/package/snapsbom">npm</a>
+        <a class="btn btn-ghost" href="https://github.com/kawacukennedy/snapsbom/releases">Download</a>
       </div>
-    </div>
+    </nav>
   </header>
-  <section>
-    <div class="container">
-      <h2 style="margin-bottom:2rem;text-align:center">Deterministic SBOMs that run anywhere</h2>
-      <div class="grid">
-        <div class="card">
-          <h3>Local-first</h3>
-          <p style="color:var(--muted)">Zero network calls, zero telemetry. Runs offline in CLI, Node.js, or browser via WASM.</p>
-        </div>
-        <div class="card">
-          <h3>Deterministic</h3>
-          <p style="color:var(--muted)">Same input produces byte-for-byte identical output. Essential for verification and compliance.</p>
-        </div>
-        <div class="card">
-          <h3>Standards compliant</h3>
-          <p style="color:var(--muted)">Outputs SPDX 2.3 and CycloneDX 1.6 JSON with reproducible formatting.</p>
-        </div>
+  <main>
+    <section class="hero">
+      <div class="eyebrow">Deterministic • Local-first • Standards Compliant</div>
+      <h1>SBOMs in a snap.<br>No cloud. No friction.</h1>
+      <p class="sub">Generate deterministic SPDX 2.3 and CycloneDX 1.6 SBOMs from your lockfiles in milliseconds. Runs in CLI or browser. Identical output every time.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="https://www.npmjs.com/package/snapsbom">Try with npx</a>
+        <a class="btn btn-secondary" href="https://github.com/kawacukennedy/snapsbom">View on GitHub</a>
       </div>
-    </div>
-  </section>
-  <section id="demo">
-    <div class="container">
-      <h2 style="margin-bottom:1rem">Quick Start</h2>
-      <pre><code>npx snapsbom .</code></pre>
-      <p style="margin-top:1rem;color:var(--muted)">Drop files here in the full demo (coming soon). For now, the CLI works locally with zero dependencies.</p>
-    </div>
-  </section>
+    </section>
+    <section class="panel">
+      <div class="code">
+        <div class="code-head">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+        <pre><code>$ npx snapsbom .
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "spdxVersion": "SPDX-2.3",
+  "name": "SnapSBOM SBOM",
+  ...
+  "packages": [...]
+}</code></pre>
+      </div>
+    </section>
+    <section class="grid">
+      <article class="card">
+        <h3>Deterministic by Design</h3>
+        <p>Same input produces byte-for-byte identical output across OS, time, and runtime. Built for verification and compliance.</p>
+      </article>
+      <article class="card">
+        <h3>Truly Local-First</h3>
+        <p>Zero network calls. Zero telemetry. Works offline, in CI, and in air-gapped environments.</p>
+      </article>
+      <article class="card">
+        <h3>CLI + Browser</h3>
+        <p>Shared Rust core ensures CLI and WASM behave identically. No Docker. No heavy dependencies.</p>
+      </article>
+      <article class="card">
+        <h3>Standards Compliant</h3>
+        <p>Outputs SPDX 2.3 and CycloneDX 1.6 JSON with reproducible, canonical formatting.</p>
+      </article>
+    </section>
+  </main>
   <footer>
-    <div class="container">
-      <p>MIT Licensed &middot; <a href="https://github.com/kawacukennedy/snapsbom" style="color:var(--muted)">GitHub</a></p>
-    </div>
+    <p>MIT License • <a href="https://github.com/kawacukennedy/snapsbom">GitHub</a> • <a href="https://www.npmjs.com/package/snapsbom">npm</a></p>
   </footer>
 </body>
 </html>
