@@ -1,0 +1,29 @@
+{
+  "name": "snapsbom",
+  "version": "0.1.0",
+  "description": "Deterministic SBOM generator (SPDX/CycloneDX) - CLI and WASM",
+  "bin": {
+    "snapsbom": "./bin/snapsbom"
+  },
+  "files": [
+    "bin/snapsbom"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kawacukennedy/snapsbom.git"
+  },
+  "keywords": [
+    "sbom",
+    "spdx",
+    "cyclonedx",
+    "security",
+    "supply-chain",
+    "deterministic"
+  ],
+  "author": "SnapSBOM Contributors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kawacukennedy/snapsbom/issues"
+  },
+  "homepage": "https://kawacukennedy.github.io/snapsbom/"
+}
