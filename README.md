@@ -33,7 +33,7 @@ snapsbom .
 
 ### Browser
 
-Try it instantly in your browser with zero upload: [snapsbom.dev](https://snapsbom.dev)
+Try it instantly in your browser: coming soon
 
 Drag & drop your `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `go.mod`/`go.sum`, `poetry.lock`, or `pyproject.toml` - SBOM generates entirely in your browser.
 
