@@ -3,12 +3,12 @@ name = "snapsbom"
 version = "0.1.0"
 edition = "2021"
 authors = ["SnapSBOM Contributors"]
-description = "Deterministic SBOM generator that runs in CLI and WASM"
+description = "Deterministic SBOM generator that runs in CLI and WASM with zero cloud, zero friction"
 license = "MIT"
-repository = "https://github.com/snapsbom/snapsbom"
-homepage = "https://snapsbom.dev"
+repository = "https://github.com/kawacukennedy/snapsbom"
+homepage = "https://kawacukennedy.github.io/snapsbom/"
 readme = "README.md"
-keywords = ["sbom", "spdx", "cyclonedx", "security", "supply-chain"]
+keywords = ["sbom", "spdx", "cyclonedx", "security", "supply-chain", "deterministic"]
 categories = ["command-line-utilities", "development-tools", "wasm"]
 
 [lib]
@@ -20,12 +20,21 @@ path = "src/main.rs"
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
-serde_json = { version = "1.0", features = ["preserve_order"] }
+serde_json = "1.0"
 sha2 = "0.10"
 clap = { version = "4.5", features = ["derive"] }
 anyhow = "1.0"
 thiserror = "1.0"
+indexmap = "2.6"
+percent-encoding = "2.3"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen = "0.2"
+wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
 js-sys = "0.3"
+web-sys = { version = "0.3", features = ["File", "FileReader", "Blob", "Event", "ProgressEvent", "console"] }
+console_error_panic_hook = "0.1"
+
+[dev-dependencies]
+assert_cmd = "2.2.2"
+predicates = "3.1.4"
+tempfile = "3.13"
