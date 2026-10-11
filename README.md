@@ -68,3 +68,23 @@ MIT License - see [LICENSE](./LICENSE) for details.
 ## ⭐ Star History
 
 If SnapSBOM helps you, please consider starring the repo to help others discover it!
+
+## 📈 Roadmap
+
+- [x] Core engine & deterministic serialization
+- [ ] npm/pnpm/yarn lockfile parsers
+- [ ] Python (poetry.lock, requirements.txt) support
+- [ ] Go (go.mod/go.sum) support
+- [ ] WASM build & browser UI
+- [ ] Pre-commit hooks
+- [ ] GitHub Actions integration
+- [ ] Content hash verification
+
+## 💬 Community
+
+- [Discussions](https://github.com/kawacukennedy/snapsbom/discussions) - Ask questions, share ideas
+- [Issues](https://github.com/kawacukennedy/snapsbom/issues) - Report bugs or request features
+
+## 🙌 Acknowledgments
+
+Built with Rust, WASM, and a focus on developer UX. Inspired by the need for simple, trustworthy SBOM tooling in the age of AI and increasing compliance requirements.
