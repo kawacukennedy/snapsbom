@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SnapSBOM - Deterministic SBOMs in a snap</title>
+  <meta name="description" content="Deterministic SBOM generator that runs in CLI and WASM with zero cloud, zero friction." />
+  <style>
+    :root { --bg:#0f172a; --fg:#e2e8f0; --primary:#3b82f6; --muted:#94a3b8; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--fg);line-height:1.6}
+    header{padding:4rem 1rem;text-align:center;background:linear-gradient(180deg,#0f172a 0%,#1e293b 100%)}
+    .container{max-width:960px;margin:0 auto;padding:0 1rem}
+    h1{font-size:3rem;margin-bottom:.5rem}
+    .tagline{color:var(--muted);font-size:1.25rem;margin-bottom:2rem}
+    .btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+    .btn{padding:.75rem 1.5rem;border-radius:.5rem;text-decoration:none;border:1px solid transparent}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-secondary{border-color:#475569;color:var(--fg)}
+    section{padding:3rem 1rem}
+    .grid{display:grid;gap:2rem;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+    .card{padding:1.5rem;border:1px solid #334155;border-radius:.75rem;background:#1e293b}
+    pre{background:#0f172a;padding:1rem;border-radius:.5rem;overflow:auto;border:1px solid #334155}
+    footer{text-align:center;padding:2rem;color:var(--muted);border-top:1px solid #334155}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>SnapSBOM</h1>
+      <p class="tagline">SBOMs in a snap. No cloud. No friction.</p>
+      <div class="btns">
+        <a class="btn btn-primary" href="https://github.com/kawacukennedy/snapsbom">View on GitHub</a>
+        <a class="btn btn-secondary" href="#demo">Try Demo</a>
+        <a class="btn btn-secondary" href="https://github.com/kawacukennedy/snapsbom#quick-start">Get Started</a>
+      </div>
+    </div>
+  </header>
+  <section>
+    <div class="container">
+      <h2 style="margin-bottom:2rem;text-align:center">Deterministic SBOMs that run anywhere</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Local-first</h3>
+          <p style="color:var(--muted)">Zero network calls, zero telemetry. Runs offline in CLI, Node.js, or browser via WASM.</p>
+        </div>
+        <div class="card">
+          <h3>Deterministic</h3>
+          <p style="color:var(--muted)">Same input produces byte-for-byte identical output. Essential for verification and compliance.</p>
+        </div>
+        <div class="card">
+          <h3>Standards compliant</h3>
+          <p style="color:var(--muted)">Outputs SPDX 2.3 and CycloneDX 1.6 JSON with reproducible formatting.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="demo">
+    <div class="container">
+      <h2 style="margin-bottom:1rem">Quick Start</h2>
+      <pre><code>npx snapsbom .</code></pre>
+      <p style="margin-top:1rem;color:var(--muted)">Drop files here in the full demo (coming soon). For now, the CLI works locally with zero dependencies.</p>
+    </div>
+  </section>
+  <footer>
+    <div class="container">
+      <p>MIT Licensed &middot; <a href="https://github.com/kawacukennedy/snapsbom" style="color:var(--muted)">GitHub</a></p>
+    </div>
+  </footer>
+</body>
+</html>
