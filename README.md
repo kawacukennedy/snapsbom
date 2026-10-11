@@ -1,90 +1,82 @@
 # SnapSBOM
 
-> SBOMs in a snap. No cloud. No friction.
+<div align="center">
 
-SnapSBOM generates deterministic [SBOMs](https://www.cisa.gov/resources-tools/resources/software-bill-materials-sbom) (Software Bill of Materials) in milliseconds. It runs entirely locally in your CLI or browser with zero network calls, zero telemetry, and byte-for-byte reproducible output.
-
+[![npm](https://img.shields.io/npm/v/snapsbom.svg)](https://www.npmjs.com/package/snapsbom)
+[![Crates.io](https://img.shields.io/crates/v/snapsbom.svg)](https://crates.io/crates/snapsbom)
+[![GitHub Release](https://img.shields.io/github/release/kawacukennedy/snapsbom.svg)](https://github.com/kawacukennedy/snapsbom/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Built with Rust](https://img.shields.io/badge/built%20with-Rust-orange.svg)](https://www.rust-lang.org/)
-[![WASM Ready](https://img.shields.io/badge/WASM-ready-654FF0.svg)](https://webassembly.org/)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/kawacukennedy/snapsbom/ci.yml?branch=main)](https://github.com/kawacukennedy/snapsbom/actions)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 
-##  Features
+**Deterministic SBOM generation that runs anywhere.**
 
-- **Lightning fast**: Generates SBOMs in milliseconds, even for large projects
-- **Truly local-first**: Zero network calls, zero telemetry, zero tracking. Works fully offline and in air-gapped environments.
-- **Deterministic by default**: Same input always produces byte-for-byte identical output. Critical for verification and compliance.
-- **Runs anywhere**: Identical behavior in CLI (native), Node.js (npx), and browser (WASM). No Docker required.
-- **Standards compliant**: Outputs [SPDX 2.3](https://spdx.github.io/spdx-spec/v2.3/) and [CycloneDX 1.6](https://cyclonedx.org/specification/overview/) JSON.
-- **Minimal & focused**: Analyzes lockfiles for accuracy with no heavy filesystem scanning. Fast, simple, and reliable.
+[Demo](https://kawacukennedy.github.io/snapsbom/) | [Docs](https://github.com/kawacukennedy/snapsbom#installation) | [npm](https://www.npmjs.com/package/snapsbom) | [Releases](https://github.com/kawacukennedy/snapsbom/releases)
 
-##  Quick Start
+</div>
 
-### CLI (recommended)
+SnapSBOM generates deterministic [SBOMs](https://www.cisa.gov/resources-tools/resources/software-bill-materials-sbom) (Software Bill of Materials) in milliseconds. It runs entirely locally in CLI or browser with zero network calls, zero telemetry, and byte-for-byte reproducible output.
+
+## Features
+
+- **Deterministic by design**: Same input always produces byte-for-byte identical output for verification and compliance.
+- **Local-first**: Zero network calls, zero telemetry. Works offline and in air-gapped environments.
+- **Runs anywhere**: CLI, npx, and browser share the same Rust core for identical results.
+- **Standards compliant**: Outputs [SPDX 2.3](https://spdx.github.io/spdx-spec/v2.3/) and [CycloneDX 1.6](https://cyclonedx.org/specification/overview/).
+- **Fast & minimal**: Analyzes lockfiles directly. No heavy scanning, no Docker required.
+
+## Installation
+
+### Use with npx (no install needed)
 
 ```bash
-# Run with npx (no install needed)
 npx snapsbom .
+```
 
-# Or install globally
+### npm global install
+
+```bash
 npm install -g snapsbom
 snapsbom .
 ```
 
-### Browser
+### Download binary
 
-Try it instantly in your browser: coming soon
+Download the latest binary for your platform from [GitHub Releases](https://github.com/kawacukennedy/snapsbom/releases).
 
-Drag & drop your `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `go.mod`/`go.sum`, `poetry.lock`, or `pyproject.toml` - SBOM generates entirely in your browser.
-
-### Output formats
+### Install from source
 
 ```bash
-# SPDX 2.3 (default)
-snapsbom . --format spdx
-
-# CycloneDX 1.6
-snapsbom . --format cyclonedx
-
-# Write to file
-snapsbom . > sbom.spdx.json
+cargo install --git https://github.com/kawacukennedy/snapsbom
+snapsbom .
 ```
 
-##  Why Determinism Matters
+## Usage
 
-Most SBOM tools produce slightly different output each run (different ordering, formatting). SnapSBOM guarantees byte-for-byte identical output for the same input across different machines, OSes, and runtimes. This is essential for:
-- **Supply chain verification**: Reproducible builds and artifact attestation
-- **Compliance**: Auditable, diffable SBOMs for regulations like the [EU Cyber Resilience Act (CRA)](https://digital-strategy.ec.europa.eu/en/library/cyber-resilience-act)
-- **Trust**: Content hashes match regardless of where generation happens
+```bash
+# Generate SPDX (default)
+snapsbom .
 
-##  Contributing
+# Generate CycloneDX
+snapsbom . --format cyclonedx
 
-We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+# Specify lockfile or directory
+snapsbom package-lock.json
+snapsbom . --output sbom.spdx.json
+```
 
-##  License
+## Why determinism matters
 
-MIT License - see [LICENSE](./LICENSE) for details.
+Deterministic output enables reproducible builds, diffable SBOMs, and trustworthy supply chain verification - critical for compliance like the [EU Cyber Resilience Act (CRA)](https://digital-strategy.ec.europa.eu/en/library/cyber-resilience-act).
 
-##  Star History
+## Contributing
 
-If SnapSBOM helps you, please consider starring the repo to help others discover it!
+Contributions welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-##  Roadmap
+## License
 
-- [x] Core engine & deterministic serialization
-- [ ] npm/pnpm/yarn lockfile parsers
-- [ ] Python (poetry.lock, requirements.txt) support
-- [ ] Go (go.mod/go.sum) support
-- [ ] WASM build & browser UI
-- [ ] Pre-commit hooks
-- [ ] GitHub Actions integration
-- [ ] Content hash verification
+MIT. See [LICENSE](./LICENSE).
 
-##  Community
+## Acknowledgments
 
-- [Discussions](https://github.com/kawacukennedy/snapsbom/discussions) - Ask questions, share ideas
-- [Issues](https://github.com/kawacukennedy/snapsbom/issues) - Report bugs or request features
-
-##  Acknowledgments
-
-Built with Rust, WASM, and a focus on developer UX. Inspired by the need for simple, trustworthy SBOM tooling in the age of AI and increasing compliance requirements.
+Built with Rust, focused on simplicity, correctness, and developer experience.
