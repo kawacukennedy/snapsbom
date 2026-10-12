@@ -1,6 +1,10 @@
 # SnapSBOM
 
 <div align="center">
+  <img src="docs/assets/logo.svg" alt="SnapSBOM Logo" width="120" height="120" />
+</div>
+
+<div align="center">
 
 [![npm](https://img.shields.io/npm/v/snapsbom.svg)](https://www.npmjs.com/package/snapsbom)
 [![Crates.io](https://img.shields.io/crates/v/snapsbom.svg)](https://crates.io/crates/snapsbom)
@@ -80,3 +84,17 @@ MIT. See [LICENSE](./LICENSE).
 ## Acknowledgments
 
 Built with Rust, focused on simplicity, correctness, and developer experience.
+
+## Demo
+
+See SnapSBOM in action - deterministic SBOMs in milliseconds.
+
+```bash
+npx snapsbom .
+```
+
+[View demo on landing page](https://kawacukennedy.github.io/snapsbom/)
+
+<div align="center">
+  <img src="docs/assets/demo.gif" alt="SnapSBOM Demo" width="900" />
+</div>
