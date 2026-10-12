@@ -1,43 +1,56 @@
 # SnapSBOM
 
-<div align="center">
-  <img src="docs/assets/logo.svg" alt="SnapSBOM Logo" width="120" height="120" />
-</div>
+<p align="center">
+  <img src="docs/assets/logo.svg" alt="SnapSBOM Logo" width="160" height="160" />
+</p>
 
-<div align="center">
+<h1 align="center">SnapSBOM</h1>
 
-[![npm](https://img.shields.io/npm/v/snapsbom.svg)](https://www.npmjs.com/package/snapsbom)
-[![Crates.io](https://img.shields.io/crates/v/snapsbom.svg)](https://crates.io/crates/snapsbom)
-[![GitHub Release](https://img.shields.io/github/release/kawacukennedy/snapsbom.svg)](https://github.com/kawacukennedy/snapsbom/releases)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/kawacukennedy/snapsbom/ci.yml?branch=main)](https://github.com/kawacukennedy/snapsbom/actions)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
+<p align="center">
+  <strong>Deterministic SBOM generation. Same input. Same output. Every time.</strong>
+</p>
 
-**Deterministic SBOM generation that runs anywhere.**
+<p align="center">
+  <a href="https://www.npmjs.com/package/snapsbom"><img src="https://img.shields.io/npm/v/snapsbom.svg?style=for-the-badge&color=blue" alt="npm"></a>
+  <a href="https://crates.io/crates/snapsbom"><img src="https://img.shields.io/crates/v/snapsbom.svg?style=for-the-badge&color=orange" alt="crates.io"></a>
+  <a href="https://github.com/kawacukennedy/snapsbom/releases"><img src="https://img.shields.io/github/release/kawacukennedy/snapsbom.svg?style=for-the-badge&color=green" alt="release"></a>
+  <a href="https://github.com/kawacukennedy/snapsbom/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/kawacukennedy/snapsbom/ci.yml?style=for-the-badge&branch=main" alt="build"></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge" alt="license"></a>
+</p>
 
-[Demo](https://kawacukennedy.github.io/snapsbom/) | [Docs](https://github.com/kawacukennedy/snapsbom#installation) | [npm](https://www.npmjs.com/package/snapsbom) | [Releases](https://github.com/kawacukennedy/snapsbom/releases)
+<p align="center">
+  <a href="https://kawacukennedy.github.io/snapsbom/">Live Demo</a> •
+  <a href="https://github.com/kawacukennedy/snapsbom/blob/main/README.md#quick-start">Quick Start</a> •
+  <a href="https://www.npmjs.com/package/snapsbom">npm</a> •
+  <a href="https://github.com/kawacukennedy/snapsbom/releases">Releases</a>
+</p>
 
-</div>
+---
 
-SnapSBOM generates deterministic [SBOMs](https://www.cisa.gov/resources-tools/resources/software-bill-materials-sbom) (Software Bill of Materials) in milliseconds. It runs entirely locally in CLI or browser with zero network calls, zero telemetry, and byte-for-byte reproducible output.
+SnapSBOM generates deterministic [SBOMs](https://www.cisa.gov/resources-tools/resources/software-bill-materials-sbom) (Software Bill of Materials) in milliseconds. Built for speed, correctness, and trust, it runs entirely locally with zero network calls and zero telemetry.
 
-## Features
+<p align="center">
+  <img src="docs/assets/demo.gif" alt="SnapSBOM Demo" width="900" style="border-radius: 12px; box-shadow: 0 10px 40px -20px rgba(0,0,0,0.5);" />
+</p>
 
-- **Deterministic by design**: Same input always produces byte-for-byte identical output for verification and compliance.
-- **Local-first**: Zero network calls, zero telemetry. Works offline and in air-gapped environments.
-- **Runs anywhere**: CLI, npx, and browser share the same Rust core for identical results.
-- **Standards compliant**: Outputs [SPDX 2.3](https://spdx.github.io/spdx-spec/v2.3/) and [CycloneDX 1.6](https://cyclonedx.org/specification/overview/).
-- **Fast & minimal**: Analyzes lockfiles directly. No heavy scanning, no Docker required.
+## Why SnapSBOM
 
-## Installation
+- **Deterministic by design** — Same input produces byte-for-byte identical output across platforms, runtimes, and time.
+- **Local-first & private** — No network calls, no telemetry, no tracking. Works offline and in air-gapped environments.
+- **Run anywhere** — Identical logic in CLI, npx, and browser (WASM). One codebase. One truth.
+- **Standards compliant** — Generate [SPDX 2.3](https://spdx.github.io/spdx-spec/v2.3/) or [CycloneDX 1.6](https://cyclonedx.org/specification/overview/) SBOMs.
+- **Blazing fast & minimal** — Parses lockfiles directly. No heavy filesystem scanning, no Docker dependencies.
+- **Built for compliance** — Reproducible output makes verification, auditing, and compliance (including [EU CRA](https://digital-strategy.ec.europa.eu/en/library/cyber-resilience-act)) effortless.
 
-### Use with npx (no install needed)
+## Quick Start
+
+### Run instantly with npx
 
 ```bash
 npx snapsbom .
 ```
 
-### npm global install
+### Install globally
 
 ```bash
 npm install -g snapsbom
@@ -46,9 +59,9 @@ snapsbom .
 
 ### Download binary
 
-Download the latest binary for your platform from [GitHub Releases](https://github.com/kawacukennedy/snapsbom/releases).
+Prebuilt binaries are available on [GitHub Releases](https://github.com/kawacukennedy/snapsbom/releases).
 
-### Install from source
+### Build from source
 
 ```bash
 cargo install --git https://github.com/kawacukennedy/snapsbom
@@ -58,43 +71,31 @@ snapsbom .
 ## Usage
 
 ```bash
-# Generate SPDX (default)
+# Generate SPDX 2.3 (default)
 snapsbom .
 
-# Generate CycloneDX
+# Generate CycloneDX 1.6
 snapsbom . --format cyclonedx
 
-# Specify lockfile or directory
+# Target specific lockfile or directory
 snapsbom package-lock.json
+
+# Write to file
 snapsbom . --output sbom.spdx.json
 ```
 
-## Why determinism matters
+## How It Works
 
-Deterministic output enables reproducible builds, diffable SBOMs, and trustworthy supply chain verification - critical for compliance like the [EU Cyber Resilience Act (CRA)](https://digital-strategy.ec.europa.eu/en/library/cyber-resilience-act).
+SnapSBOM reads your existing lockfiles (`package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `go.mod`/`go.sum`, `poetry.lock`), normalizes dependencies deterministically, and emits standards-compliant SBOMs with canonical ordering. The Rust core is shared between CLI and WASM, guaranteeing identical behavior everywhere.
 
 ## Contributing
 
-Contributions welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md).
+We welcome contributions! Read our [Contributing Guide](./CONTRIBUTING.md) to get started.
 
 ## License
 
-MIT. See [LICENSE](./LICENSE).
+Licensed under the [MIT License](./LICENSE).
 
 ## Acknowledgments
 
-Built with Rust, focused on simplicity, correctness, and developer experience.
-
-## Demo
-
-See SnapSBOM in action - deterministic SBOMs in milliseconds.
-
-```bash
-npx snapsbom .
-```
-
-[View demo on landing page](https://kawacukennedy.github.io/snapsbom/)
-
-<div align="center">
-  <img src="docs/assets/demo.gif" alt="SnapSBOM Demo" width="900" />
-</div>
+Built with Rust and a focus on correctness, simplicity, and developer experience.
