@@ -1,110 +1,731 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SnapSBOM - Deterministic SBOM Generator</title>
-  <meta name="description" content="Deterministic SBOM generator. Generate SPDX and CycloneDX SBOMs instantly from lockfiles. Runs locally in CLI and browser. Zero cloud.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,sans-serif}
-    :root{--bg:#0b1026;--card:#121a2f;--border:#1e2a45;--text:#e6e8ee;--muted:#9aa0c3;--primary:#4f9deb;--success:#22c55e;--code:#0f1529}
-    body{background:radial-gradient(1200px 800px at 80% -20%,#16204a 0%,var(--bg) 55%);color:var(--text);line-height:1.7;font-size:16px}
-    header{padding:32px 20px 0}
-    nav{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
-    .logo{display:flex;gap:12px;align-items:center;text-decoration:none;color:var(--text)}
-    .logo-badge{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#4f9deb,#2563eb);box-shadow:0 10px 30px -10px rgba(79,157,235,.7);display:grid;place-items:center}
-    .links{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
-    .link{color:var(--muted);text-decoration:none;font-weight:500}
-    .link:hover{color:var(--text)}
-    .btn{padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:600}
-    .btn-ghost{color:var(--text);border:1px solid var(--border)}
-    .hero{max-width:1100px;margin:60px auto 0;padding:0 20px;text-align:center}
-    .eyebrow{color:var(--primary);font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:12px;margin-bottom:16px}
-    h1{font-size:clamp(2.2rem,6vw,4.2rem);line-height:1.08;margin-bottom:16px;font-weight:700}
-    .sub{color:var(--muted);max-width:720px;margin:0 auto 28px;font-size:clamp(1rem,2vw,1.12rem)}
-    .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-    .btn-primary{background:linear-gradient(135deg,#4f9deb,#2563eb);color:#fff;box-shadow:0 20px 40px -20px rgba(37,99,235,.9)}
-    .btn-secondary{color:var(--text);border:1px solid var(--border);background:transparent}
-    .panel{max-width:1100px;margin:40px auto;padding:0 20px}
-    .code{background:linear-gradient(180deg,rgba(79,157,235,.12),transparent 60%),var(--code);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 60px 120px -80px rgba(79,157,235,.4)}
-    .code-head{display:flex;gap:10px;padding:16px 18px;border-bottom:1px solid var(--border)}
-    .dot{width:10px;height:10px;border-radius:50%;background:#334155}
-    .dot:nth-child(2){background:#475569}
-    .dot:nth-child(3){background:#64748b}
-    pre{padding:22px 18px;overflow:auto;color:var(--text);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px}
-    .grid{max-width:1100px;margin:60px auto;padding:0 20px;display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-    .card{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--card);border:1px solid var(--border);border-radius:14px;padding:22px}
-    .card h3{margin-bottom:8px;font-size:18px}
-    .card p{color:var(--muted)}
-    footer{margin:60px auto 30px;text-align:center;color:var(--muted)}
-    a{color:inherit}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SnapSBOM — Deterministic SBOMs in milliseconds</title>
+<meta name="description" content="SnapSBOM turns lockfiles into SPDX 2.3 and CycloneDX 1.6 SBOMs in milliseconds. Runs locally, makes zero network calls, and produces byte-for-byte reproducible output." />
+<meta name="theme-color" content="#070B16" />
+<meta name="color-scheme" content="dark" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="SnapSBOM — Deterministic SBOMs in milliseconds" />
+<meta property="og:description" content="SPDX 2.3 and CycloneDX 1.6 SBOMs from your lockfiles. Local-first, zero network, byte-for-byte reproducible." />
+<meta property="og:url" content="https://kawacukennedy.github.io/snapsbom/" />
+<meta property="og:image" content="https://kawacukennedy.github.io/snapsbom/assets/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="SnapSBOM — Deterministic SBOMs in milliseconds" />
+<meta name="twitter:description" content="SPDX 2.3 and CycloneDX 1.6 SBOMs from your lockfiles. Local-first, zero network, byte-for-byte reproducible." />
+<meta name="twitter:image" content="https://kawacukennedy.github.io/snapsbom/assets/og.png" />
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    --ink:#070B16; --ink-2:#0A1024; --panel:#0D1530; --panel-2:#0B1226;
+    --line:#1A2544; --line-2:#243257;
+    --text:#E9EFFC; --muted:#8394BE; --muted-2:#5F6F98;
+    --cyan:#41E3FF; --blue:#5B7CFF; --violet:#9D7BFF; --green:#39E1A3;
+    --sans:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --display:'Space Grotesk','IBM Plex Sans',sans-serif;
+    --maxw:1180px;
+    --pad:clamp(20px,5vw,64px);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  body{
+    font-family:var(--sans); background:var(--ink); color:var(--text);
+    line-height:1.62; font-size:16px; -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  /* engineering-grid backdrop */
+  body::before{
+    content:""; position:fixed; inset:0; z-index:-2; pointer-events:none;
+    background:
+      radial-gradient(1000px 620px at 82% -12%, rgba(91,124,255,.16), transparent 60%),
+      radial-gradient(760px 520px at 12% 8%, rgba(65,227,255,.10), transparent 60%),
+      linear-gradient(180deg,#070B16 0%,#080D1C 60%,#070B16 100%);
+  }
+  body::after{
+    content:""; position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.5;
+    background-image:
+      linear-gradient(rgba(36,50,87,.28) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(36,50,87,.28) 1px, transparent 1px);
+    background-size:56px 56px;
+    mask-image:radial-gradient(circle at 50% 0%, #000 0%, transparent 78%);
+    -webkit-mask-image:radial-gradient(circle at 50% 0%, #000 0%, transparent 78%);
+  }
+  a{color:inherit}
+  ::selection{background:rgba(65,227,255,.28)}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding-inline:var(--pad)}
+  .mono{font-family:var(--mono)}
+  .eye{
+    font-family:var(--mono); font-size:11.5px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--muted-2);
+  }
+  .rule{height:1px; background:var(--line); border:0}
+
+  /* ---------- top bar ---------- */
+  header.top{
+    position:sticky; top:0; z-index:50;
+    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    background:rgba(7,11,22,.72); border-bottom:1px solid var(--line);
+  }
+  .top-in{display:flex; align-items:center; justify-content:space-between; gap:18px; height:64px}
+  .brand{display:flex; align-items:center; gap:11px; text-decoration:none; color:var(--text)}
+  .brand svg{width:30px;height:30px;display:block}
+  .brand b{font-family:var(--display); font-weight:600; letter-spacing:-.01em; font-size:16.5px}
+  .brand .v{font-family:var(--mono); font-size:10.5px; color:var(--cyan); border:1px solid var(--line-2); border-radius:999px; padding:1px 7px; margin-left:2px}
+  nav.links{display:flex; align-items:center; gap:26px}
+  nav.links a{font-size:13.5px; color:var(--muted); text-decoration:none; transition:color .18s}
+  nav.links a:hover{color:var(--text)}
+  .ghost{
+    display:inline-flex; align-items:center; gap:8px; font-size:13.5px; font-weight:500;
+    color:var(--text); text-decoration:none; border:1px solid var(--line-2);
+    border-radius:9px; padding:8px 14px; transition:border-color .18s, background .18s;
+    white-space:nowrap;
+  }
+  .ghost:hover{border-color:#33477a; background:rgba(91,124,255,.08)}
+  @media(max-width:820px){nav.links{display:none}}
+
+  /* ---------- section frame ---------- */
+  section{position:relative}
+  .frame{
+    max-width:var(--maxw); margin:0 auto; padding:0 var(--pad);
+  }
+  .sec-head{display:flex; align-items:baseline; gap:18px; padding-top:clamp(56px,9vw,104px)}
+  .sec-head .idx{font-family:var(--mono); font-size:12px; color:var(--cyan); padding-top:4px; white-space:nowrap}
+  .sec-head h2{
+    font-family:var(--display); font-weight:600; letter-spacing:-.022em;
+    font-size:clamp(1.5rem,3.4vw,2.15rem); line-height:1.12;
+  }
+  .sec-head .line{flex:1; height:1px; background:var(--line); align-self:center; min-width:24px}
+  .sec-sub{color:var(--muted); max-width:640px; margin-top:14px; font-size:15.5px}
+
+  /* ---------- hero ---------- */
+  .hero{display:grid; grid-template-columns:minmax(0,1.02fr) minmax(0,1fr); gap:clamp(28px,4vw,56px);
+        align-items:center; padding-top:clamp(40px,7vw,78px); padding-bottom:clamp(30px,5vw,56px)}
+  @media(max-width:960px){.hero{grid-template-columns:1fr; gap:40px}}
+  .kicker{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:22px}
+  .tag{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase;
+       color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:5px 11px}
+  .tag b{color:var(--cyan); font-weight:500}
+  h1.display{
+    font-family:var(--display); font-weight:700; letter-spacing:-.035em;
+    font-size:clamp(2.35rem,6vw,4rem); line-height:1.02;
+  }
+  h1.display .g{
+    background:linear-gradient(100deg,var(--cyan),var(--blue) 46%,var(--violet));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .lede{color:var(--muted); font-size:clamp(15.5px,1.5vw,17.5px); margin-top:22px; max-width:34em}
+  .cta{display:flex; flex-wrap:wrap; gap:12px; margin-top:30px; align-items:stretch}
+  .npx{
+    display:inline-flex; align-items:center; gap:12px; font-family:var(--mono); font-size:14.5px;
+    background:linear-gradient(180deg,rgba(65,227,255,.09),rgba(91,124,255,.05));
+    border:1px solid var(--line-2); border-radius:11px; padding:12px 12px 12px 16px;
+    color:var(--text); cursor:pointer; transition:border-color .18s;
+  }
+  .npx:hover{border-color:#3a4f86}
+  .npx .p{color:var(--green)}
+  .npx .cp{border-left:1px solid var(--line-2); padding-left:12px; margin-left:2px; color:var(--muted); font-size:11px; letter-spacing:.1em; text-transform:uppercase}
+  .npx.done .cp{color:var(--green)}
+  .btn{
+    display:inline-flex; align-items:center; gap:9px; text-decoration:none; font-weight:600; font-size:14.5px;
+    border-radius:11px; padding:12px 20px; border:1px solid var(--line-2); color:var(--text);
+    transition:transform .18s, border-color .18s, background .18s;
+  }
+  .btn:hover{border-color:#3a4f86; background:rgba(91,124,255,.08)}
+  .btn.solid{border-color:transparent; background:linear-gradient(100deg,var(--cyan),var(--blue)); color:#04101c}
+  .btn.solid:hover{background:linear-gradient(100deg,#5fe9ff,#6b89ff)}
+  .facts{display:flex; flex-wrap:wrap; gap:22px; margin-top:30px; padding-top:22px; border-top:1px solid var(--line)}
+  .fact .n{font-family:var(--display); font-weight:600; font-size:19px}
+  .fact .l{font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted-2); margin-top:2px}
+
+  /* ---------- terminal ---------- */
+  .term{
+    border:1px solid var(--line-2); border-radius:14px; overflow:hidden; background:var(--panel-2);
+    box-shadow:0 40px 90px -50px rgba(65,227,255,.5), 0 30px 70px -50px rgba(91,124,255,.5);
+  }
+  .term-bar{display:flex; align-items:center; gap:9px; padding:12px 15px; border-bottom:1px solid var(--line); background:rgba(255,255,255,.015)}
+  .dot{width:10px;height:10px;border-radius:50%}
+  .d1{background:#ff5f57}.d2{background:#febc2e}.d3{background:#28c840}
+  .term-title{margin-left:8px; font-family:var(--mono); font-size:11.5px; color:var(--muted-2)}
+  .term-body{
+    font-family:var(--mono); font-size:12.8px; line-height:1.85; padding:18px 18px 22px; min-height:318px;
+    white-space:pre-wrap; word-break:break-word; color:#c9d6f5;
+  }
+  .term-body .pr{color:var(--green)}
+  .term-body .cmd{color:var(--text)}
+  .term-body .k{color:var(--cyan)}
+  .term-body .dim{color:var(--muted-2)}
+  .term-body .ok{color:var(--green)}
+  .term-body .hash{color:var(--violet)}
+  .term-body .str{color:#a7d3ff}
+  .term-body .json{color:#9fb2dd}
+  .caret{display:inline-block; width:8px; height:15px; background:var(--cyan); vertical-align:-2px; animation:blink 1.05s steps(1) infinite; margin-left:2px}
+  @keyframes blink{50%{opacity:0}}
+
+  /* ---------- metapages ---------- */
+  .spec{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); border:1px solid var(--line); border-radius:14px; overflow:hidden; margin-top:clamp(30px,5vw,54px)}
+  .spec .cell{padding:22px 24px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); background:rgba(255,255,255,.012)}
+  .spec .cell:last-child{border-right:0}
+  .spec .n{font-family:var(--display); font-weight:600; font-size:clamp(1.5rem,3vw,2rem); letter-spacing:-.02em}
+  .spec .n small{font-size:.5em; color:var(--muted-2); font-family:var(--mono); font-weight:400}
+  .spec .l{font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted-2); margin-top:8px}
+
+  /* ---------- determinism ---------- */
+  .split{display:grid; grid-template-columns:1fr 1fr; gap:clamp(24px,4vw,52px); align-items:start; margin-top:38px}
+  @media(max-width:900px){.split{grid-template-columns:1fr}}
+  .points{display:flex; flex-direction:column; gap:2px}
+  .point{display:grid; grid-template-columns:auto 1fr; gap:16px; padding:18px 0; border-top:1px solid var(--line)}
+  .point:last-child{border-bottom:1px solid var(--line)}
+  .point .pi{font-family:var(--mono); font-size:12px; color:var(--cyan); padding-top:2px}
+  .point h4{font-size:15.5px; font-weight:600; margin-bottom:3px}
+  .point p{color:var(--muted); font-size:14px}
+
+  .proof{border:1px solid var(--line-2); border-radius:14px; overflow:hidden; background:var(--panel-2)}
+  .proof-h{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 16px; border-bottom:1px solid var(--line)}
+  .proof-h .t{font-family:var(--mono); font-size:11.5px; color:var(--muted); letter-spacing:.05em}
+  .run{
+    font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; cursor:pointer;
+    background:transparent; color:var(--cyan); border:1px solid var(--line-2); border-radius:8px; padding:6px 11px;
+    transition:background .18s,border-color .18s;
+  }
+  .run:hover{background:rgba(65,227,255,.1); border-color:#3a4f86}
+  .run[disabled]{opacity:.5; cursor:default}
+  .proof-b{padding:18px 16px; font-family:var(--mono); font-size:12.6px; line-height:2}
+  .proof-b .row{display:flex; gap:12px; align-items:baseline; flex-wrap:wrap}
+  .proof-b .lbl{color:var(--muted-2); min-width:74px}
+  .proof-b .h{color:var(--violet); word-break:break-all}
+  .proof-b .eq{color:var(--green)}
+  .proof-b .match{margin-top:12px; padding-top:12px; border-top:1px dashed var(--line); color:var(--green)}
+  .gifwrap{margin-top:34px; border:1px solid var(--line-2); border-radius:14px; overflow:hidden; background:var(--panel-2)}
+  .gifwrap img{display:block; width:100%; height:auto}
+
+  /* ---------- formats ---------- */
+  .tabs{display:flex; gap:6px; margin-top:34px; border-bottom:1px solid var(--line); flex-wrap:wrap}
+  .tab{
+    font-family:var(--mono); font-size:12.5px; letter-spacing:.04em; color:var(--muted);
+    background:transparent; border:0; border-bottom:2px solid transparent; padding:12px 16px; cursor:pointer;
+  }
+  .tab[aria-selected="true"]{color:var(--text); border-bottom-color:var(--cyan)}
+  .tab:hover{color:var(--text)}
+  .codepane{position:relative; border:1px solid var(--line-2); border-top:0; border-radius:0 0 14px 14px; background:var(--panel-2)}
+  .codepane[hidden]{display:none}
+  .codepane pre{margin:0; padding:22px; overflow:auto; font-family:var(--mono); font-size:12.6px; line-height:1.72; color:#b9c8ea}
+  .codepane .k{color:var(--cyan)} .codepane .s{color:#a7d3ff} .codepane .n{color:var(--violet)} .codepane .b{color:var(--green)}
+  .copyc{position:absolute; top:12px; right:12px; font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+         background:rgba(7,11,22,.7); color:var(--muted); border:1px solid var(--line-2); border-radius:8px; padding:6px 10px; cursor:pointer}
+  .copyc:hover{color:var(--text); border-color:#3a4f86}
+
+  /* ---------- feature grid ---------- */
+  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:0; border:1px solid var(--line); border-radius:14px; overflow:hidden; margin-top:38px}
+  .card{padding:28px 26px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); position:relative; background:rgba(255,255,255,.012)}
+  .card .num{font-family:var(--mono); font-size:11px; color:var(--muted-2)}
+  .card h3{font-family:var(--display); font-weight:600; font-size:17px; margin:12px 0 8px; letter-spacing:-.01em}
+  .card p{color:var(--muted); font-size:14px}
+  .card .glow{position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .3s;
+    background:radial-gradient(280px 160px at 50% 0%, rgba(91,124,255,.16), transparent 70%)}
+  .card:hover .glow{opacity:1}
+
+  /* ---------- pipeline ---------- */
+  .pipe{display:grid; grid-template-columns:repeat(4,1fr); gap:0; margin-top:40px; border:1px solid var(--line); border-radius:14px; overflow:hidden}
+  @media(max-width:820px){.pipe{grid-template-columns:1fr 1fr}}
+  @media(max-width:480px){.pipe{grid-template-columns:1fr}}
+  .pstep{padding:26px 22px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); background:rgba(255,255,255,.012)}
+  .pstep .pn{font-family:var(--mono); font-size:11px; color:var(--cyan)}
+  .pstep h4{font-size:15px; margin:12px 0 6px; font-weight:600}
+  .pstep p{color:var(--muted); font-size:13.2px}
+  .pchips{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
+  .pchip{font-family:var(--mono); font-size:11px; color:var(--muted); border:1px solid var(--line); border-radius:6px; padding:3px 8px}
+
+  /* ---------- inputs table ---------- */
+  .tbl{margin-top:34px; border:1px solid var(--line); border-radius:14px; overflow:hidden}
+  .tbl table{width:100%; border-collapse:collapse; font-size:14px}
+  .tbl th,.tbl td{text-align:left; padding:14px 18px; border-bottom:1px solid var(--line)}
+  .tbl th{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted-2); font-weight:500}
+  .tbl tr:last-child td{border-bottom:0}
+  .tbl td.m{font-family:var(--mono); font-size:12.8px; color:#b9c8ea}
+  .pill{font-family:var(--mono); font-size:11px; border-radius:999px; padding:3px 10px; white-space:nowrap}
+  .pill.yes{color:var(--green); border:1px solid rgba(57,225,163,.35); background:rgba(57,225,163,.08)}
+  .pill.soon{color:var(--muted); border:1px solid var(--line-2)}
+
+  /* ---------- cli ---------- */
+  .cli{display:grid; grid-template-columns:1.05fr 1fr; gap:26px; margin-top:38px}
+  @media(max-width:900px){.cli{grid-template-columns:1fr}}
+  .codebox{border:1px solid var(--line-2); border-radius:14px; background:var(--panel-2); overflow:hidden}
+  .codebox .ch{display:flex; align-items:center; gap:8px; padding:12px 15px; border-bottom:1px solid var(--line); font-family:var(--mono); font-size:11.5px; color:var(--muted-2)}
+  .codebox pre{margin:0; padding:20px; overflow:auto; font-family:var(--mono); font-size:12.6px; line-height:1.78; color:#b9c8ea}
+  .codebox .c{color:var(--muted-2)} .codebox .k{color:var(--cyan)} .codebox .s{color:#a7d3ff} .codebox .g{color:var(--green)}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--line); margin-top:clamp(60px,9vw,110px); padding:44px 0 60px}
+  .foot{display:flex; flex-wrap:wrap; gap:24px; justify-content:space-between; align-items:flex-start}
+  .foot .fbrand{display:flex; align-items:center; gap:11px}
+  .foot .fbrand svg{width:26px;height:26px}
+  .foot .tagline{color:var(--muted-2); font-family:var(--mono); font-size:12px; margin-top:10px}
+  .fcol h5{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted-2); margin-bottom:12px}
+  .fcol a{display:block; color:var(--muted); text-decoration:none; font-size:13.5px; margin-bottom:8px}
+  .fcol a:hover{color:var(--text)}
+
+  /* reveal */
+  .rv{opacity:0; transform:translateY(16px); transition:opacity .7s ease, transform .7s ease}
+  .rv.in{opacity:1; transform:none}
+  @media (prefers-reduced-motion:reduce){
+    .rv{opacity:1; transform:none; transition:none}
+    .caret{animation:none}
+  }
+  :focus-visible{outline:2px solid var(--cyan); outline-offset:3px; border-radius:6px}
+</style>
 </head>
 <body>
-  <header>
-    <nav>
-      <a class="logo" href="/">
-        <div class="logo-badge">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="10" stroke="white" stroke-width="1.6"/><path d="M6.5 11.5L9 14L15.5 8" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div><div style="font-weight:700">SnapSBOM</div><div style="font-size:12px;color:var(--muted)">Deterministic SBOM Generator</div></div>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="#">
+      <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+        <rect x="3" y="3" width="58" height="58" rx="15" fill="#0C142B" stroke="#22315A"/>
+        <path d="M40 17.5c-2.6-2.4-6.4-3.8-10.7-3.8-6.6 0-11.1 3-11.1 7.6 0 4 2.8 6.2 8.4 7.5l4.4 1c4.2 1 5.8 1.9 5.8 3.8 0 2.3-2.4 3.7-6.4 3.7-3.4 0-6.5-1.2-8.7-3.3" stroke="url(#lg)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+        <path d="M40 17.5c-2.6-2.4-6.4-3.8-10.7-3.8-6.6 0-11.1 3-11.1 7.6" stroke="#41E3FF" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+        <circle cx="17.6" cy="18.4" r="3.4" fill="#39E1A3"/>
+        <circle cx="40.6" cy="45.3" r="3.4" fill="#39E1A3"/>
+        <defs><linearGradient id="lg" x1="17" y1="15" x2="42" y2="46" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#41E3FF"/><stop offset=".5" stop-color="#5B7CFF"/><stop offset="1" stop-color="#9D7BFF"/>
+        </linearGradient></defs>
+      </svg>
+      <b>SnapSBOM</b><span class="v">v0.1.0</span>
+    </a>
+    <nav class="links">
+      <a href="#determinism">Determinism</a>
+      <a href="#formats">Formats</a>
+      <a href="#features">Features</a>
+      <a href="#inputs">Inputs</a>
+      <a href="#cli">CLI</a>
+      <a class="ghost" href="https://github.com/kawacukennedy/snapsbom">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        GitHub
       </a>
-      <div class="links">
-        <a class="link" href="https://github.com/kawacukennedy/snapsbom">GitHub</a>
-        <a class="link" href="https://www.npmjs.com/package/snapsbom">npm</a>
-        <a class="btn btn-ghost" href="https://github.com/kawacukennedy/snapsbom/releases">Download</a>
-      </div>
     </nav>
-  </header>
-  <main>
-    <section class="hero">
-      <div class="eyebrow">Deterministic • Local-first • Standards Compliant</div>
-      <h1>SBOMs in a snap.<br>No cloud. No friction.</h1>
-      <p class="sub">Generate deterministic SPDX 2.3 and CycloneDX 1.6 SBOMs from your lockfiles in milliseconds. Runs in CLI or browser. Identical output every time.</p>
+  </div>
+</header>
+
+<main>
+  <!-- ================= HERO ================= -->
+  <section class="wrap hero">
+    <div class="rv">
+      <div class="kicker">
+        <span class="tag">Software Bill of Materials</span>
+        <span class="tag"><b>SPDX 2.3</b> · CycloneDX 1.6</span>
+        <span class="tag">local-first</span>
+      </div>
+      <h1 class="display">Deterministic SBOMs,<br><span class="g">in a snap.</span></h1>
+      <p class="lede">
+        Point SnapSBOM at your lockfile and get a standards-compliant SPDX or CycloneDX document in
+        milliseconds — computed entirely on your machine, with zero network calls and output that is
+        <strong style="color:var(--text)">byte-for-byte reproducible</strong>.
+      </p>
       <div class="cta">
-        <a class="btn btn-primary" href="https://www.npmjs.com/package/snapsbom">Try with npx</a>
-        <a class="btn btn-secondary" href="https://github.com/kawacukennedy/snapsbom">View on GitHub</a>
+        <button class="npx" id="npxCopy" type="button" aria-label="Copy command: npx snapsbom .">
+          <span class="p">$</span><span>npx snapsbom .</span><span class="cp" id="cpLabel">Copy</span>
+        </button>
+        <a class="btn solid" href="https://www.npmjs.com/package/snapsbom">Get it on npm</a>
+        <a class="btn" href="https://github.com/kawacukennedy/snapsbom">Source</a>
       </div>
-    </section>
-    <section class="panel">
-      <div class="code">
-        <div class="code-head">
-          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <div class="facts">
+        <div class="fact"><div class="n">~3 ms</div><div class="l">per lockfile</div></div>
+        <div class="fact"><div class="n">0</div><div class="l">network calls</div></div>
+        <div class="fact"><div class="n">2</div><div class="l">output formats</div></div>
+        <div class="fact"><div class="n">1</div><div class="l">Rust core</div></div>
+      </div>
+    </div>
+
+    <div class="rv">
+      <div class="term" role="img" aria-label="Terminal running npx snapsbom . and producing a 7-component SPDX SBOM with a stable sha256">
+        <div class="term-bar">
+          <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>
+          <span class="term-title">snapsbom — zsh</span>
         </div>
-        <pre><code>$ npx snapsbom .
-{
-  "SPDXID": "SPDXRef-DOCUMENT",
-  "spdxVersion": "SPDX-2.3",
-  "name": "SnapSBOM SBOM",
-  ...
-  "packages": [...]
-}</code></pre>
+        <div class="term-body" id="term"></div>
       </div>
-    </section>
-    <section class="grid">
-      <article class="card">
-        <h3>Deterministic by Design</h3>
-        <p>Same input produces byte-for-byte identical output across OS, time, and runtime. Built for verification and compliance.</p>
-      </article>
-      <article class="card">
-        <h3>Truly Local-First</h3>
-        <p>Zero network calls. Zero telemetry. Works offline, in CI, and in air-gapped environments.</p>
-      </article>
-      <article class="card">
-        <h3>CLI + Browser</h3>
-        <p>Shared Rust core ensures CLI and WASM behave identically. No Docker. No heavy dependencies.</p>
-      </article>
-      <article class="card">
-        <h3>Standards Compliant</h3>
-        <p>Outputs SPDX 2.3 and CycloneDX 1.6 JSON with reproducible, canonical formatting.</p>
-      </article>
-    </section>
-  </main>
-  <footer>
-    <p>MIT License • <a href="https://github.com/kawacukennedy/snapsbom">GitHub</a> • <a href="https://www.npmjs.com/package/snapsbom">npm</a></p>
-  </footer>
+    </div>
+  </section>
+
+  <!-- ================= SPEC STRIP ================= -->
+  <section class="wrap">
+    <div class="spec rv">
+      <div class="cell"><div class="n">0 <small>bytes</small></div><div class="l">sent over the wire</div></div>
+      <div class="cell"><div class="n">7 <small>packages</small></div><div class="l">from the sample lockfile</div></div>
+      <div class="cell"><div class="n">sha256</div><div class="l">stable, diffable output</div></div>
+      <div class="cell"><div class="n">MIT</div><div class="l">single static binary</div></div>
+    </div>
+  </section>
+
+  <!-- ================= DETERMINISM ================= -->
+  <section id="determinism">
+    <div class="frame">
+      <div class="sec-head rv"><span class="idx">§ 01</span><h2>Same input. Same bytes. Every time.</h2><span class="line"></span></div>
+      <p class="sec-sub rv">Most SBOM tools stamp the current time, walk the tree in arbitrary order, and hand out random identifiers — so every run produces a different file. SnapSBOM emits a <em>canonical</em> document instead, which makes an SBOM something you can actually verify.</p>
+
+      <div class="split">
+        <div class="points rv">
+          <div class="point"><span class="pi">01</span><div><h4>Timestamps are pinned</h4><p>The document’s <span class="mono" style="font-size:12.5px">created</span> field is fixed, not “now”, so re-runs never drift.</p></div></div>
+          <div class="point"><span class="pi">02</span><div><h4>Components are canonical</h4><p>Packages are deduplicated by purl, sorted, and numbered <span class="mono" style="font-size:12.5px">SPDXRef-Package-1…N</span> predictably.</p></div></div>
+          <div class="point"><span class="pi">03</span><div><h4>Keys have a stable order</h4><p>Field ordering is fixed, so a line-level diff between two SBOMs is meaningful.</p></div></div>
+          <div class="point"><span class="pi">04</span><div><h4>Verification is a string compare</h4><p>Hashes match, or they don’t. No heuristics, no “close enough”.</p></div></div>
+        </div>
+
+        <div class="rv">
+          <div class="proof">
+            <div class="proof-h">
+              <span class="t">$ snapsbom examples/demo | sha256sum</span>
+              <button class="run" id="runAgain" type="button">Run again</button>
+            </div>
+            <div class="proof-b">
+              <div class="row"><span class="lbl">run 1</span><span class="h" id="h1">ff8584cd…c7689</span></div>
+              <div class="row"><span class="lbl">run 2</span><span class="h" id="h2">………………………</span></div>
+              <div class="match" id="match" style="opacity:0">✔ identical — 0 bytes changed</div>
+            </div>
+          </div>
+          <div class="gifwrap">
+            <img src="assets/determinism.gif" alt="SnapSBOM run twice, producing the same SHA-256 hash" width="820" loading="lazy" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FORMATS ================= -->
+  <section id="formats">
+    <div class="frame">
+      <div class="sec-head rv"><span class="idx">§ 02</span><h2>Two standards, one command.</h2><span class="line"></span></div>
+      <p class="sec-sub rv">Emit either ecosystem’s format without changing anything else. The core, the parsing and the canonical ordering are identical — only the serialisation differs.</p>
+
+      <div class="tabs rv" role="tablist" aria-label="Output format">
+        <button class="tab" role="tab" id="tab-spdx" aria-controls="pane-spdx" aria-selected="true">SPDX 2.3</button>
+        <button class="tab" role="tab" id="tab-cdx" aria-controls="pane-cdx" aria-selected="false">CycloneDX 1.6</button>
+      </div>
+
+      <div class="codepane rv" id="pane-spdx" role="tabpanel" aria-labelledby="tab-spdx">
+        <button class="copyc" data-copy="spdx" type="button">Copy</button>
+<pre><code><span class="k">"spdxVersion"</span>: <span class="s">"SPDX-2.3"</span>,
+<span class="k">"SPDXID"</span>: <span class="s">"SPDXRef-DOCUMENT"</span>,
+<span class="k">"dataLicense"</span>: <span class="s">"CC0-1.0"</span>,
+<span class="k">"name"</span>: <span class="s">"SnapSBOM SBOM"</span>,
+<span class="k">"creationInfo"</span>: {
+  <span class="k">"created"</span>: <span class="s">"2026-01-01T00:00:00Z"</span>,
+  <span class="k">"creators"</span>: [<span class="s">"Tool: SnapSBOM"</span>]
+},
+<span class="k">"packages"</span>: [
+  {
+    <span class="k">"SPDXID"</span>: <span class="s">"SPDXRef-Package-1"</span>,
+    <span class="k">"name"</span>: <span class="s">"@types/node"</span>,
+    <span class="k">"versionInfo"</span>: <span class="s">"22.10.2"</span>,
+    <span class="k">"externalRefs"</span>: [{
+      <span class="k">"referenceType"</span>: <span class="s">"purl"</span>,
+      <span class="k">"referenceLocator"</span>: <span class="s">"pkg:npm/%40types/node@22.10.2"</span>
+    }]
+  }
+]</code></pre>
+      </div>
+
+      <div class="codepane rv" id="pane-cdx" role="tabpanel" aria-labelledby="tab-cdx" hidden>
+        <button class="copyc" data-copy="cdx" type="button">Copy</button>
+<pre><code><span class="k">"bomFormat"</span>: <span class="s">"CycloneDX"</span>,
+<span class="k">"specVersion"</span>: <span class="s">"1.6"</span>,
+<span class="k">"version"</span>: <span class="n">1</span>,
+<span class="k">"components"</span>: [
+  {
+    <span class="k">"type"</span>: <span class="s">"library"</span>,
+    <span class="k">"name"</span>: <span class="s">"@types/node"</span>,
+    <span class="k">"version"</span>: <span class="s">"22.10.2"</span>,
+    <span class="k">"purl"</span>: <span class="s">"pkg:npm/%40types/node@22.10.2"</span>,
+    <span class="k">"supplier"</span>: { <span class="k">"name"</span>: <span class="s">"NOASSERTION"</span> },
+    <span class="k">"licenses"</span>: []
+  }
+]</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FEATURES ================= -->
+  <section id="features">
+    <div class="frame">
+      <div class="sec-head rv"><span class="idx">§ 03</span><h2>Small tool, serious guarantees.</h2><span class="line"></span></div>
+      <div class="grid rv">
+        <article class="card"><span class="glow"></span><div class="num">01</div><h3>Deterministic by design</h3><p>Fixed timestamps, sorted keys, canonical IDs. Identical input produces identical output — forever.</p></article>
+        <article class="card"><span class="glow"></span><div class="num">02</div><h3>Truly local-first</h3><p>Zero network calls, zero telemetry. Runs offline, in CI, and in air-gapped environments.</p></article>
+        <article class="card"><span class="glow"></span><div class="num">03</div><h3>One core, two runtimes</h3><p>The same Rust core powers the CLI and the browser build, so both agree exactly.</p></article>
+        <article class="card"><span class="glow"></span><div class="num">04</div><h3>Standards compliant</h3><p>Emits valid SPDX 2.3 and CycloneDX 1.6 JSON with canonical, reproducible formatting.</p></article>
+        <article class="card"><span class="glow"></span><div class="num">05</div><h3>Fast &amp; dependency-light</h3><p>Parses lockfiles directly — no source scan, no container, no Docker. Milliseconds, not minutes.</p></article>
+        <article class="card"><span class="glow"></span><div class="num">06</div><h3>Tiny surface</h3><p>A single static binary, or a one-line <span class="mono" style="font-size:12.5px">npx</span>. Nothing to configure to get a valid SBOM.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= HOW ================= -->
+  <section id="how">
+    <div class="frame">
+      <div class="sec-head rv"><span class="idx">§ 04</span><h2>How it works.</h2><span class="line"></span></div>
+      <div class="pipe rv">
+        <div class="pstep"><div class="pn">STEP 01</div><h4>Read</h4><p>Locate and parse the lockfile — no source tree walk, no build step.</p><div class="pchips"><span class="pchip">package-lock.json</span></div></div>
+        <div class="pstep"><div class="pn">STEP 02</div><h4>Canonicalise</h4><p>Build the component set, deduplicate by purl, sort, and pin stable IDs.</p><div class="pchips"><span class="pchip">purl</span><span class="pchip">sort</span></div></div>
+        <div class="pstep"><div class="pn">STEP 03</div><h4>Emit</h4><p>Serialise to SPDX 2.3 or CycloneDX 1.6 with a stable key order.</p><div class="pchips"><span class="pchip">SPDX</span><span class="pchip">CDX</span></div></div>
+        <div class="pstep"><div class="pn">STEP 04</div><h4>Ship</h4><p>Write to stdout or a file. Drop it straight into CI as a build artifact.</p><div class="pchips"><span class="pchip">stdout</span><span class="pchip">--output</span></div></div>
+      </div>
+      <p class="sec-sub rv" style="margin-top:22px">One Rust crate compiles twice — as a CLI (via <span class="mono" style="font-size:12.5px">clap</span>) and as a WebAssembly module (via <span class="mono" style="font-size:12.5px">wasm-bindgen</span>) — which is why the terminal and the browser produce identical documents.</p>
+    </div>
+  </section>
+
+  <!-- ================= INPUTS ================= -->
+  <section id="inputs">
+    <div class="frame">
+      <div class="sec-head rv"><span class="idx">§ 05</span><h2>What it reads today.</h2><span class="line"></span></div>
+      <p class="sec-sub rv">SnapSBOM is deliberately honest about scope: it guarantees correctness for npm lockfiles, and grows one ecosystem at a time.</p>
+      <div class="tbl rv">
+        <table>
+          <thead><tr><th>Ecosystem</th><th>Lockfile</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>npm</td><td class="m">package-lock.json (v2 / v3)</td><td><span class="pill yes">supported</span></td></tr>
+            <tr><td>pnpm</td><td class="m">pnpm-lock.yaml</td><td><span class="pill soon">roadmap</span></td></tr>
+            <tr><td>Yarn</td><td class="m">yarn.lock</td><td><span class="pill soon">roadmap</span></td></tr>
+            <tr><td>Python</td><td class="m">poetry.lock · requirements.txt</td><td><span class="pill soon">roadmap</span></td></tr>
+            <tr><td>Cargo</td><td class="m">Cargo.lock</td><td><span class="pill soon">roadmap</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CLI ================= -->
+  <section id="cli">
+    <div class="frame">
+      <div class="sec-head rv"><span class="idx">§ 06</span><h2>Drop it into CI.</h2><span class="line"></span></div>
+      <p class="sec-sub rv">No secrets, no network, no external service. Generate an SBOM and attach it to the build.</p>
+      <div class="cli">
+        <div class="codebox rv">
+          <div class="ch">cli — reference</div>
+<pre><span class="c">$ snapsbom --help</span>
+
+<span class="k">Usage:</span> snapsbom [OPTIONS] &lt;PATH&gt;
+
+  &lt;PATH&gt;              lockfile or directory
+
+<span class="k">Options:</span>
+  --format &lt;FORMAT&gt;   <span class="c">[default: spdx]</span>
+                      <span class="c">values: spdx, cyclonedx</span>
+  --output &lt;OUTPUT&gt;   <span class="c">stdout if omitted</span>
+  -h, --help
+  -V, --version
+
+<span class="c"># examples</span>
+<span class="g">$</span> snapsbom .
+<span class="g">$</span> snapsbom . --format cyclonedx
+<span class="g">$</span> snapsbom . --output sbom.spdx.json</pre>
+        </div>
+        <div class="codebox rv">
+          <div class="ch">.github/workflows/sbom.yml</div>
+<pre><span class="k">name:</span> SBOM
+<span class="k">on:</span> { push: { branches: [main] } }
+<span class="k">jobs:</span>
+  <span class="k">sbom:</span>
+    <span class="k">runs-on:</span> ubuntu-latest
+    <span class="k">steps:</span>
+      - <span class="k">uses:</span> actions/checkout@v4
+      - <span class="k">uses:</span> actions/setup-node@v4
+        <span class="k">with:</span> { node-version: 20 }
+      - <span class="k">name:</span> Generate SBOM
+        <span class="k">run:</span> <span class="s">npx --yes snapsbom . \</span>
+          <span class="s">--format cyclonedx \</span>
+          <span class="s">--output sbom.cdx.json</span>
+      - <span class="k">uses:</span> actions/upload-artifact@v4
+        <span class="k">with:</span>
+          <span class="k">name:</span> sbom
+          <span class="k">path:</span> sbom.cdx.json</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>
+      <div class="fbrand">
+        <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <rect x="3" y="3" width="58" height="58" rx="15" fill="#0C142B" stroke="#22315A"/>
+          <path d="M40 17.5c-2.6-2.4-6.4-3.8-10.7-3.8-6.6 0-11.1 3-11.1 7.6 0 4 2.8 6.2 8.4 7.5l4.4 1c4.2 1 5.8 1.9 5.8 3.8 0 2.3-2.4 3.7-6.4 3.7-3.4 0-6.5-1.2-8.7-3.3" stroke="url(#lg2)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+          <path d="M40 17.5c-2.6-2.4-6.4-3.8-10.7-3.8-6.6 0-11.1 3-11.1 7.6" stroke="#41E3FF" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+          <circle cx="17.6" cy="18.4" r="3.4" fill="#39E1A3"/><circle cx="40.6" cy="45.3" r="3.4" fill="#39E1A3"/>
+          <defs><linearGradient id="lg2" x1="17" y1="15" x2="42" y2="46" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#41E3FF"/><stop offset=".5" stop-color="#5B7CFF"/><stop offset="1" stop-color="#9D7BFF"/>
+          </linearGradient></defs>
+        </svg>
+        <b style="font-family:var(--display)">SnapSBOM</b>
+      </div>
+      <p class="tagline">Deterministic SBOMs in milliseconds.<br>No cloud. No telemetry. No nonsense.</p>
+    </div>
+    <div class="fcol"><h5>Product</h5>
+      <a href="https://www.npmjs.com/package/snapsbom">npm package</a>
+      <a href="https://github.com/kawacukennedy/snapsbom">Source code</a>
+      <a href="#cli">CLI reference</a>
+      <a href="#formats">Output formats</a>
+    </div>
+    <div class="fcol"><h5>Project</h5>
+      <a href="https://github.com/kawacukennedy/snapsbom/blob/main/CONTRIBUTING.md">Contributing</a>
+      <a href="https://github.com/kawacukennedy/snapsbom/blob/main/SECURITY.md">Security</a>
+      <a href="https://github.com/kawacukennedy/snapsbom/blob/main/LICENSE">MIT License</a>
+      <a href="https://github.com/kawacukennedy/snapsbom/issues">Issues</a>
+    </div>
+  </div>
+  <div class="wrap" style="margin-top:34px; padding-top:20px; border-top:1px solid var(--line); display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between">
+    <span class="mono" style="font-size:11.5px; color:var(--muted-2)">© <span id="yr"></span> SnapSBOM contributors · MIT</span>
+    <span class="mono" style="font-size:11.5px; color:var(--muted-2)">built with 🦀 Rust · CLI + WASM</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.getElementById("yr").textContent = new Date().getFullYear();
+
+  /* ---- copy the npx command ---- */
+  var npx = document.getElementById("npxCopy");
+  if (npx) {
+    npx.addEventListener("click", function () {
+      var text = "npx snapsbom .";
+      var done = function () {
+        var l = document.getElementById("cpLabel");
+        l.textContent = "Copied";
+        npx.classList.add("done");
+        setTimeout(function () { l.textContent = "Copy"; npx.classList.remove("done"); }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, done);
+      } else {
+        var t = document.createElement("textarea"); t.value = text; document.body.appendChild(t);
+        t.select(); try { document.execCommand("copy"); } catch (e) {} document.body.removeChild(t); done();
+      }
+    });
+  }
+
+  /* ---- terminal typing ---- */
+  var term = document.getElementById("term");
+  var HASH = "ff8584cdc321a348c94c9d8e139149556ab8b895d8b83da68e41013fe38c7689";
+  var LINES = [
+    { html: '<span class="pr">$</span> <span class="cmd">npx snapsbom .</span>', delay: 0, type: true },
+    { html: '<span class="dim">  · engine</span>  snapsbom 0.1.0  <span class="dim">one rust core → cli + wasm</span>', delay: 260 },
+    { html: '<span class="dim">  · input</span>   package-lock.json  <span class="dim">lockfile v3</span>', delay: 300 },
+    { html: '<span class="dim">  · resolve</span> 8 nodes → <span class="k">7</span> unique components', delay: 330 },
+    { html: '<span class="dim">  · format</span>  <span class="k">SPDX-2.3</span> / SPDXRef-DOCUMENT', delay: 300 },
+    { html: '<span class="ok">  ✔</span> sbom.spdx.json  <span class="dim">7 components · 3 ms</span>', delay: 420 },
+    { html: '<span class="dim">    sha256</span> <span class="hash">' + HASH + '</span>', delay: 360 },
+    { html: '<span class="ok">  ✔ deterministic — output is byte-for-byte stable</span>', delay: 420 }
+  ];
+  function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+
+  function renderStatic() {
+    term.innerHTML = LINES.map(function (l) { return l.html; }).join("\n");
+  }
+  function play() {
+    term.innerHTML = "";
+    var i = 0;
+    function nextLine() {
+      if (i >= LINES.length) {
+        var c = document.createElement("span"); c.className = "caret"; term.appendChild(c);
+        return;
+      }
+      var line = LINES[i++];
+      if (line.type) {
+        // typewriter for the command line
+        var cmd = "npx snapsbom .";
+        var prefix = '<span class="pr">$ </span>';
+        var span = document.createElement("div");
+        span.style.display = "inline";
+        term.insertAdjacentHTML("beforeend", prefix);
+        var cspan = document.createElement("span"); cspan.className = "cmd";
+        term.appendChild(cspan);
+        var j = 0;
+        (function tick() {
+          if (j <= cmd.length) { cspan.textContent = cmd.slice(0, j); j++; setTimeout(tick, 62); }
+          else { term.appendChild(document.createTextNode("\n")); setTimeout(nextLine, 300); }
+        })();
+      } else {
+        term.insertAdjacentHTML("beforeend", line.html + "\n");
+        setTimeout(nextLine, line.delay);
+      }
+    }
+    nextLine();
+  }
+
+  var played = false;
+  function maybePlay() { if (!played && !reduce) { played = true; play(); } }
+  if (reduce) { renderStatic(); }
+  else {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { maybePlay(); io.disconnect(); } });
+    }, { threshold: 0.3 });
+    io.observe(term);
+    setTimeout(maybePlay, 900); // fallback if IO never fires
+  }
+
+  /* ---- determinism "run again" ---- */
+  var run = document.getElementById("runAgain");
+  if (run) {
+    run.addEventListener("click", function () {
+      var h2 = document.getElementById("h2"), m = document.getElementById("match");
+      run.disabled = true; m.style.opacity = "0";
+      h2.textContent = "computing…";
+      setTimeout(function () {
+        h2.textContent = HASH;
+        h2.style.color = "var(--violet)";
+        m.style.opacity = "1";
+        run.disabled = false;
+      }, reduce ? 0 : 900);
+    });
+  }
+
+  /* ---- format tabs ---- */
+  var tabs = [
+    { t: "tab-spdx", p: "pane-spdx" },
+    { t: "tab-cdx", p: "pane-cdx" }
+  ];
+  tabs.forEach(function (o) {
+    var tb = document.getElementById(o.t);
+    tb.addEventListener("click", function () {
+      tabs.forEach(function (x) {
+        var sel = x === o;
+        document.getElementById(x.t).setAttribute("aria-selected", String(sel));
+        document.getElementById(x.p).hidden = !sel;
+      });
+    });
+  });
+  tabs.forEach(function (o) {
+    var b = document.querySelector('[data-copy="' + o.p.replace("pane-", "") + '"]');
+    if (!b) return;
+    b.addEventListener("click", function () {
+      var code = document.getElementById(o.p).querySelector("code").innerText;
+      var done = function () { b.textContent = "Copied"; setTimeout(function () { b.textContent = "Copy"; }, 1500); };
+      if (navigator.clipboard) navigator.clipboard.writeText(code).then(done, done); else done();
+    });
+  });
+
+  /* ---- scroll reveal ---- */
+  var rvs = document.querySelectorAll(".rv");
+  if (reduce) { rvs.forEach(function (e) { e.classList.add("in"); }); }
+  else {
+    var ro = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); ro.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+    rvs.forEach(function (e) { ro.observe(e); });
+  }
+})();
+</script>
 </body>
 </html>
