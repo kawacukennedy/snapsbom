@@ -14,11 +14,23 @@ fn read_json(path: &Path) -> Result<Value> {
     Ok(v)
 }
 
-fn make_purl(name: &str, version: &str) -> String {
-    let enc_name = percent_encoding::utf8_percent_encode(name, percent_encoding::NON_ALPHANUMERIC)
-        .to_string()
-        .replace('%', "%25");
-    format!("pkg:npm/{}@{}", enc_name.replace('@', "%40").replace('/', "%2F"), version)
+/// Characters that are safe to leave unescaped in a `pkg:npm` purl segment.
+///
+/// The purl spec only requires percent-encoding of characters that are not
+/// unreserved (`A-Z a-z 0-9 - . _ ~`). In particular a hyphen must stay
+/// literal, and the `/` that separates an npm scope from its package name is
+/// preserved as a namespace separator (`@scope/name` -> `%40scope/name`).
+const PURL_ESCAPE: &percent_encoding::AsciiSet = &percent_encoding::NON_ALPHANUMERIC
+    .remove(b'-')
+    .remove(b'.')
+    .remove(b'_')
+    .remove(b'~')
+    .remove(b'/');
+
+pub(crate) fn make_purl(name: &str, version: &str) -> String {
+    let enc_name = percent_encoding::utf8_percent_encode(name, PURL_ESCAPE);
+    let enc_version = percent_encoding::utf8_percent_encode(version, PURL_ESCAPE);
+    format!("pkg:npm/{}@{}", enc_name, enc_version)
 }
 
 fn extract_from_packages(obj: &Value, out: &mut Vec<Component>) {
@@ -30,14 +42,18 @@ fn extract_from_packages(obj: &Value, out: &mut Vec<Component>) {
                 } else {
                     k
                 };
-                let purl = make_purl(name, version);
-                out.push(Component {
-                    name: name.to_string(),
-                    version: version.to_string(),
-                    purl,
-                    supplier: None,
-                    licenses: None,
-                });
+                // Skip the root project entry (key `""`), which carries no
+                // package name; only its dependencies belong in the SBOM.
+                if !name.is_empty() {
+                    let purl = make_purl(name, version);
+                    out.push(Component {
+                        name: name.to_string(),
+                        version: version.to_string(),
+                        purl,
+                        supplier: None,
+                        licenses: None,
+                    });
+                }
             }
             if let Some(dep) = v.get("dependencies").and_then(|x| x.as_object()) {
                 let mut tmp = Vec::new();
