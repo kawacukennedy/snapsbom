@@ -33,7 +33,7 @@ fn parse_lock(v: serde_json::Value) -> Result<Vec<Component>, JsValue> {
             if let Some(ver) = pv.get("version").and_then(|x| x.as_str()) {
                 let name = if k.starts_with("node_modules/") { k.strip_prefix("node_modules/").unwrap_or(k) } else { k };
                 if name.is_empty() { continue; }
-                let purl = format!("pkg:npm/{}@{}", name.replace('@', "%40").replace('/', "%2F"), ver);
+                let purl = crate::npm::make_purl(name, ver);
                 out.push(Component { name: name.to_string(), version: ver.to_string(), purl, supplier: None, licenses: None });
             }
         }

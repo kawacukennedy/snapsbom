@@ -1,10 +1,6 @@
 use crate::model::Component;
 use serde_json::{json, Value};
 
-fn gen_doc_id() -> String {
-    "SPDXRef-DOCUMENT-STATIC".to_string()
-}
-
 fn spdx_version() -> &'static str {
     "SPDX-2.3"
 }

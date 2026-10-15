@@ -16,11 +16,7 @@ pub enum Format {
 }
 
 pub fn generate_from_path(path: &Path, format: Format) -> anyhow::Result<String> {
-    let comps = if path.ends_with("package-lock.json") || path.file_name().map(|s| s == "package-lock.json").unwrap_or(false) {
-        npm::parse_package_lock(path)?
-    } else {
-        npm::parse_package_lock(path)?
-    };
+    let comps = npm::parse_package_lock(path)?;
     let v = match format {
         Format::Spdx => spdx::components_to_spdx(&comps),
         Format::Cyclonedx => cyclonedx::components_to_cyclonedx(&comps),

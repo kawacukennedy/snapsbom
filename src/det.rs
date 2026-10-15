@@ -1,4 +1,3 @@
-use serde::Serialize;
 use serde_json::{Map, Value};
 
 pub fn to_deterministic_json(v: &Value) -> anyhow::Result<String> {
@@ -28,25 +27,65 @@ fn canonicalize(v: Value) -> Value {
     }
 }
 
+/// Total ordering used to canonicalise arrays.
+///
+/// Values are ranked by type first (`null < bool < number < string < array <
+/// object`) and then compared within their type. Arrays are compared
+/// lexicographically and objects by their sorted key/value pairs, so the
+/// ordering is *content based* and identical on every machine and toolchain.
+fn type_rank(v: &Value) -> u8 {
+    match v {
+        Value::Null => 0,
+        Value::Bool(_) => 1,
+        Value::Number(_) => 2,
+        Value::String(_) => 3,
+        Value::Array(_) => 4,
+        Value::Object(_) => 5,
+    }
+}
+
 fn json_cmp(a: &Value, b: &Value) -> std::cmp::Ordering {
+    use std::cmp::Ordering;
+
+    let (ra, rb) = (type_rank(a), type_rank(b));
+    if ra != rb {
+        return ra.cmp(&rb);
+    }
+
     match (a, b) {
-        (Value::String(sa), Value::String(sb)) => sa.cmp(sb),
-        (Value::Number(na), Value::Number(nb)) => na
+        (Value::Bool(x), Value::Bool(y)) => x.cmp(y),
+        (Value::Number(x), Value::Number(y)) => x
             .as_f64()
             .unwrap_or(0.0)
-            .partial_cmp(&nb.as_f64().unwrap_or(0.0))
-            .unwrap_or(std::cmp::Ordering::Equal),
-        (Value::Bool(ba), Value::Bool(bb)) => ba.cmp(bb),
-        (Value::Null, Value::Null) => std::cmp::Ordering::Equal,
-        (Value::Object(_), _) => std::cmp::Ordering::Less,
-        (_, Value::Object(_)) => std::cmp::Ordering::Greater,
-        (Value::Array(_), _) => std::cmp::Ordering::Less,
-        (_, Value::Array(_)) => std::cmp::Ordering::Greater,
-        (Value::String(_), _) => std::cmp::Ordering::Less,
-        (_, Value::String(_)) => std::cmp::Ordering::Greater,
-        (Value::Number(_), _) => std::cmp::Ordering::Less,
-        (_, Value::Number(_)) => std::cmp::Ordering::Greater,
-        (Value::Bool(_), _) => std::cmp::Ordering::Less,
-        (_, Value::Bool(_)) => std::cmp::Ordering::Greater,
+            .partial_cmp(&y.as_f64().unwrap_or(0.0))
+            .unwrap_or(Ordering::Equal),
+        (Value::String(x), Value::String(y)) => x.cmp(y),
+        (Value::Array(x), Value::Array(y)) => {
+            for (xi, yi) in x.iter().zip(y.iter()) {
+                let c = json_cmp(xi, yi);
+                if c != Ordering::Equal {
+                    return c;
+                }
+            }
+            x.len().cmp(&y.len())
+        }
+        (Value::Object(x), Value::Object(y)) => {
+            let mut xk: Vec<&String> = x.keys().collect();
+            let mut yk: Vec<&String> = y.keys().collect();
+            xk.sort_unstable();
+            yk.sort_unstable();
+            for (xa, ya) in xk.iter().zip(yk.iter()) {
+                let c = xa.cmp(ya);
+                if c != Ordering::Equal {
+                    return c;
+                }
+                let c = json_cmp(&x[*xa], &y[*ya]);
+                if c != Ordering::Equal {
+                    return c;
+                }
+            }
+            x.len().cmp(&y.len())
+        }
+        _ => Ordering::Equal,
     }
 }
