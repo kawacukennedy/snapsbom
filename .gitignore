@@ -1,6 +1,5 @@
 # Rust
 /target/
-Cargo.lock
 **/*.rs.bk
 *.pdb
 
@@ -28,6 +27,7 @@ Thumbs.db
 *~
 
 # Build artifacts
+npm/*/bin/
 *.wasm
 *.tar.gz
 *.zip

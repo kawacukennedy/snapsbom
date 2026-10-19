@@ -19,8 +19,8 @@ pub fn components_to_cyclonedx(components: &[Component]) -> Value {
         "version": 1,
         "metadata": {
             "timestamp": "2026-01-01T00:00:00Z",
-            "tools": [{"name": "SnapSBOM", "version": "0.1.0"}],
-            "component": {"type": "application", "name": "snapSBOM", "version": "0.1.0"}
+            "tools": [{"name": "SnapSBOM", "version": env!("CARGO_PKG_VERSION")}],
+            "component": {"type": "application", "name": "snapSBOM", "version": env!("CARGO_PKG_VERSION")}
         },
         "components": comps
     })

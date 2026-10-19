@@ -3,7 +3,7 @@ use snapsbom::{generate_from_path, Format};
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
-#[command(name = "snapsbom", about = "Deterministic SBOM generator", version = "0.1.0")]
+#[command(name = "snapsbom", about = "Deterministic SBOM generator", version)]
 struct Args {
     #[arg(help = "Path to lockfile (e.g. package-lock.json) or directory")]
     path: PathBuf,
