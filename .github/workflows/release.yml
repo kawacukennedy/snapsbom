@@ -69,7 +69,15 @@ jobs:
           registry-url: https://registry.npmjs.org
       - name: Publish ${{ matrix.npm }}
         shell: bash
-        run: npm publish "./npm/${{ matrix.npm }}" --provenance --access public
+        run: |
+          set -euo pipefail
+          pkg="${{ matrix.npm }}"
+          ver="$(node -p "require('./npm/' + process.argv[1] + '/package.json').version" "$pkg")"
+          if npm view "$pkg@$ver" version >/dev/null 2>&1; then
+            echo "$pkg@$ver is already on the registry — skipping."
+            exit 0
+          fi
+          npm publish "./npm/$pkg" --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -84,7 +92,15 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org
       - name: Publish snapsbom
-        run: npm publish --provenance --access public
+        shell: bash
+        run: |
+          set -euo pipefail
+          ver="$(node -p "require('./package.json').version")"
+          if npm view "snapsbom@$ver" version >/dev/null 2>&1; then
+            echo "snapsbom@$ver is already on the registry — skipping."
+            exit 0
+          fi
+          npm publish --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
