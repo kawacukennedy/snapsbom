@@ -1,13 +1,23 @@
 {
   "name": "snapsbom",
-  "version": "0.1.0",
-  "description": "Deterministic SBOM generator (SPDX/CycloneDX) - CLI and WASM",
+  "version": "0.2.0",
+  "description": "Deterministic SBOM generator (SPDX 2.3 / CycloneDX 1.6) — local-first, zero network, byte-for-byte reproducible.",
   "bin": {
-    "snapsbom": "./bin/snapsbom"
+    "snapsbom": "bin/snapsbom.js"
   },
   "files": [
-    "bin/snapsbom"
+    "bin/snapsbom.js"
   ],
+  "optionalDependencies": {
+    "snapsbom-darwin-arm64": "0.2.0",
+    "snapsbom-darwin-x64": "0.2.0",
+    "snapsbom-linux-arm64": "0.2.0",
+    "snapsbom-linux-x64": "0.2.0",
+    "snapsbom-win32-x64": "0.2.0"
+  },
+  "engines": {
+    "node": ">=16"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kawacukennedy/snapsbom.git"
@@ -18,7 +28,9 @@
     "cyclonedx",
     "security",
     "supply-chain",
-    "deterministic"
+    "deterministic",
+    "rust",
+    "cli"
   ],
   "author": "SnapSBOM Contributors",
   "license": "MIT",

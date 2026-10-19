@@ -1,0 +1,20 @@
+{
+  "name": "snapsbom-darwin-x64",
+  "version": "0.2.0",
+  "description": "Prebuilt SnapSBOM binary for macOS (x64).",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "files": [
+    "bin/snapsbom"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kawacukennedy/snapsbom.git"
+  },
+  "license": "MIT",
+  "homepage": "https://kawacukennedy.github.io/snapsbom/"
+}

@@ -1,6 +1,6 @@
 [package]
 name = "snapsbom"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["SnapSBOM Contributors"]
 description = "Deterministic SBOM generator that runs in CLI and WASM with zero cloud, zero friction"
