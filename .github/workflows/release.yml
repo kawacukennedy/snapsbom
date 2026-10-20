@@ -77,7 +77,7 @@ jobs:
             echo "$pkg@$ver is already on the registry — skipping."
             exit 0
           fi
-          npm publish "./npm/$pkg" --provenance
+          npm publish "./npm/$pkg" --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -100,7 +100,7 @@ jobs:
             echo "snapsbom@$ver is already on the registry — skipping."
             exit 0
           fi
-          npm publish --provenance
+          npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
