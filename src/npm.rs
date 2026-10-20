@@ -1,5 +1,5 @@
 use crate::model::Component;
-use anyhow::Result;
+use anyhow::{Context, Result};
 use serde_json::Value;
 use std::collections::BTreeMap;
 use std::fs::File;
@@ -7,10 +7,11 @@ use std::io::Read;
 use std::path::Path;
 
 fn read_json(path: &Path) -> Result<Value> {
-    let mut file = File::open(path)?;
+    let mut file = File::open(path).with_context(|| format!("cannot open {}", path.display()))?;
     let mut buf = String::new();
     file.read_to_string(&mut buf)?;
-    let v: Value = serde_json::from_str(&buf)?;
+    let v: Value = serde_json::from_str(&buf)
+        .with_context(|| format!("{} is not valid JSON", path.display()))?;
     Ok(v)
 }
 
@@ -86,15 +87,45 @@ fn extract_from_deps_obj(dep: &serde_json::Map<String, Value>, out: &mut Vec<Com
                     licenses: None,
                 });
             }
+            // npm v5/v6 (`lockfileVersion: 1`) nests transitive dependencies
+            // under each entry; walk them so nothing is silently dropped.
+            if let Some(nested) = obj.get("dependencies").and_then(|x| x.as_object()) {
+                extract_from_deps_obj(nested, out);
+            }
         }
     }
 }
 
 pub fn parse_package_lock(path: &Path) -> Result<Vec<Component>> {
     let v = read_json(path)?;
+
+    // Refuse input we don't recognise. Producing an empty SBOM for a file
+    // that isn't a lockfile would be far worse than failing: a CI job would
+    // report success while the generated SBOM listed zero packages. Note
+    // that `package.json` is deliberately NOT accepted here - it has
+    // `dependencies` but only version *ranges*, not resolved versions.
+    let looks_like_lockfile = v.get("lockfileVersion").is_some()
+        || v.get("packages").map(|p| p.is_object()).unwrap_or(false);
+    if !looks_like_lockfile {
+        anyhow::bail!(
+            "{} does not look like an npm package-lock.json \
+             (missing the \"lockfileVersion\" or \"packages\" key). \
+             Pass the lockfile itself, or a directory containing one.",
+            path.display()
+        );
+    }
+
     let mut out: Vec<Component> = Vec::new();
-    if let Some(lock_ver) = v.get("lockfileVersion").and_then(|x| x.as_u64()) {
-        if lock_ver == 2 || lock_ver == 3 {
+    match v.get("lockfileVersion").and_then(|x| x.as_u64()) {
+        // npm v5/v6: everything lives in a `dependencies` tree.
+        Some(1) => {
+            if let Some(deps) = v.get("dependencies").and_then(|x| x.as_object()) {
+                extract_from_deps_obj(deps, &mut out);
+            }
+        }
+        // npm v7+: a flat `packages` map, with a `dependencies` fallback for
+        // unusually small or hand-trimmed files.
+        Some(_) => {
             if let Some(packages) = v.get("packages") {
                 extract_from_packages(packages, &mut out);
             }
@@ -106,9 +137,10 @@ pub fn parse_package_lock(path: &Path) -> Result<Vec<Component>> {
                 }
             }
         }
-    } else {
-        if let Some(packages) = v.get("packages") {
-            extract_from_packages(packages, &mut out);
+        None => {
+            if let Some(packages) = v.get("packages") {
+                extract_from_packages(packages, &mut out);
+            }
         }
     }
     let mut seen: BTreeMap<String, Component> = BTreeMap::new();
