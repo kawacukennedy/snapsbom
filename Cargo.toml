@@ -8,7 +8,9 @@ license = "MIT"
 repository = "https://github.com/kawacukennedy/snapsbom"
 homepage = "https://kawacukennedy.github.io/snapsbom/"
 readme = "README.md"
-keywords = ["sbom", "spdx", "cyclonedx", "security", "supply-chain", "deterministic"]
+# crates.io allows a maximum of 5 keywords — "security" was dropped as the
+# most generic of the six, since "sbom"/"spdx"/"cyclonedx" cover discovery.
+keywords = ["sbom", "spdx", "cyclonedx", "supply-chain", "deterministic"]
 categories = ["command-line-utilities", "development-tools", "wasm"]
 
 [lib]
