@@ -38,11 +38,12 @@ fn extract_from_packages(obj: &Value, out: &mut Vec<Component>) {
     if let Some(map) = obj.as_object() {
         for (k, v) in map.iter() {
             if let Some(version) = v.get("version").and_then(|x| x.as_str()) {
-                let name = if k.starts_with("node_modules/") {
-                    k.strip_prefix("node_modules/").unwrap_or(k)
-                } else {
-                    k
-                };
+                // The name is the segment after the *last* `node_modules/`:
+                // `node_modules/a/node_modules/@scope/b` is the package
+                // `@scope/b`, resolved against its parent. Stripping only
+                // the first prefix produced purls like
+                // `pkg:npm/a/node_modules/b@2.5.1`.
+                let name = k.rsplit("node_modules/").next().unwrap_or(k);
                 // Skip the root project entry (key `""`), which carries no
                 // package name; only its dependencies belong in the SBOM.
                 if !name.is_empty() {
@@ -56,27 +57,24 @@ fn extract_from_packages(obj: &Value, out: &mut Vec<Component>) {
                     });
                 }
             }
-            if let Some(dep) = v.get("dependencies").and_then(|x| x.as_object()) {
-                let mut tmp = Vec::new();
-                extract_from_deps_obj(dep, &mut tmp);
-                out.extend(tmp);
-            }
+            // npm v7+ entries also carry a `dependencies` object, but its
+            // values are *declared semver ranges* (`{"ms": "^2.0.0"}`), not
+            // resolved packages - and every resolved package is already a
+            // key of this very map. Reading it here used to add one
+            // duplicate component per declared range, with the range itself
+            // used as the version (`pkg:npm/ms@%5E2.0.0`).
         }
     }
 }
 
 fn extract_from_deps_obj(dep: &serde_json::Map<String, Value>, out: &mut Vec<Component>) {
     for (name, v) in dep.iter() {
-        if let Some(version) = v.as_str() {
-            let purl = make_purl(name, version);
-            out.push(Component {
-                name: name.clone(),
-                version: version.to_string(),
-                purl,
-                supplier: None,
-                licenses: None,
-            });
-        } else if let Some(obj) = v.as_object() {
+        // A string value is a *declared range*, never a resolved version -
+        // both `package.json` and npm v7+ `packages.*.dependencies` look
+        // like this (`{"chalk": "^5.4.1"}`). Emitting it would invent a
+        // component that may not be installed at all, which is exactly how
+        // `pkg:npm/chalk@%5E5.4.1` ended up in generated SBOMs.
+        if let Some(obj) = v.as_object() {
             if let Some(version) = obj.get("version").and_then(|x| x.as_str()) {
                 let purl = make_purl(name, version);
                 out.push(Component {
