@@ -36,7 +36,7 @@ jobs:
             bin: snapsbom
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            npm: snapsbom-win32-x64
+            npm: snapsbom-windows-x64
             bin: snapsbom.exe
     steps:
       - uses: actions/checkout@v7

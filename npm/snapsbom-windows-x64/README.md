@@ -1,6 +1,6 @@
-# snapsbom-win32-x64
+# snapsbom-windows-x64
 
-The prebuilt **SnapSBOM** binary for `win32-x64`.
+The prebuilt **SnapSBOM** binary for `windows-x64`.
 
 This package is an implementation detail. Install the main package instead:
 

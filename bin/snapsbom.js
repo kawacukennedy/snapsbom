@@ -19,8 +19,13 @@ const path = require("path");
 const platform = process.platform; // darwin | linux | win32
 const arch = process.arch; // x64 | arm64
 
+// Map `process.platform` to our package suffix. Windows is published as
+// `snapsbom-windows-x64` rather than `snapsbom-win32-x64` because npm's
+// spam filter rejected the literal "win32" name.
+const PLATFORM_ALIAS = { win32: "windows" };
+
 const exe = platform === "win32" ? "snapsbom.exe" : "snapsbom";
-const pkg = `snapsbom-${platform}-${arch}`;
+const pkg = `snapsbom-${PLATFORM_ALIAS[platform] ?? platform}-${arch}`;
 
 function resolveBinary() {
   // 1. The optional dependency installed for this platform.
