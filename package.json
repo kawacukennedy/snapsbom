@@ -1,6 +1,6 @@
 {
   "name": "snapsbom",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Deterministic SBOM generator (SPDX 2.3 / CycloneDX 1.6) \u2014 local-first, zero network, byte-for-byte reproducible.",
   "bin": {
     "snapsbom": "bin/snapsbom.js"
@@ -9,11 +9,11 @@
     "bin/snapsbom.js"
   ],
   "optionalDependencies": {
-    "snapsbom-darwin-arm64": "0.2.1",
-    "snapsbom-darwin-x64": "0.2.1",
-    "snapsbom-linux-arm64": "0.2.1",
-    "snapsbom-linux-x64": "0.2.1",
-    "snapsbom-windows-x64": "0.2.1"
+    "snapsbom-darwin-arm64": "0.2.2",
+    "snapsbom-darwin-x64": "0.2.2",
+    "snapsbom-linux-arm64": "0.2.2",
+    "snapsbom-linux-x64": "0.2.2",
+    "snapsbom-windows-x64": "0.2.2"
   },
   "engines": {
     "node": ">=16"

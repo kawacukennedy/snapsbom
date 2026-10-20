@@ -1,6 +1,6 @@
 {
   "name": "snapsbom-darwin-x64",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Prebuilt SnapSBOM binary for macOS (x64).",
   "os": [
     "darwin"

@@ -1,6 +1,6 @@
 {
   "name": "snapsbom-darwin-arm64",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Prebuilt SnapSBOM binary for macOS (Apple silicon).",
   "os": [
     "darwin"
