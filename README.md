@@ -25,6 +25,7 @@
     <a href="https://kawacukennedy.github.io/snapsbom/"><b>Live demo</b></a> &nbsp;·&nbsp;
     <a href="#quick-start">Quick start</a> &nbsp;·&nbsp;
     <a href="#determinism">Why determinism</a> &nbsp;·&nbsp;
+    <a href="#interoperability">Interop</a> &nbsp;·&nbsp;
     <a href="#cli-reference">CLI reference</a> &nbsp;·&nbsp;
     <a href="https://www.npmjs.com/package/snapsbom">npm</a>
   </p>
@@ -239,13 +240,103 @@ Options:
 
 | Ecosystem | Lockfile | Status |
 |---|---|---|
-| **npm** | `package-lock.json` (v2 / v3) | ✅ Supported |
+| **npm** | `package-lock.json` (v1 / v2 / v3) | ✅ Supported |
 | pnpm | `pnpm-lock.yaml` | 🛣️ Roadmap |
 | Yarn | `yarn.lock` | 🛣️ Roadmap |
 | Python | `poetry.lock`, `requirements.txt` | 🛣️ Roadmap |
 | Cargo | `Cargo.lock` | 🛣️ Roadmap |
 
 SnapSBOM is intentionally **honest about scope**: it currently guarantees correctness for npm lockfiles, and grows one ecosystem at a time. PRs for new parsers are very welcome — the parser plug-in point lives in [`src/npm.rs`](./src/npm.rs).
+
+---
+
+## 🌐 Interoperability
+
+A deterministic SBOM is only useful if the rest of your toolchain can read it. SnapSBOM's output is verified against the **official specifications** and against **independent implementations** — never just against itself.
+
+Everything below was measured on one fixture: a real `npm install express react` project (`package-lock.json` v3, 67 entries → **66 resolved packages**).
+
+### Schema validation
+
+| Output | Validator | Result |
+|---|---|---|
+| CycloneDX 1.6 | `ajv` vs the official [`bom-1.6.schema.json`](https://github.com/CycloneDX/specification/blob/master/schema/bom-1.6.schema.json) (with its `spdx` + `jsf` refs) | ✅ valid |
+| SPDX 2.3 | `ajv` vs the official [`spdx-schema.json`](https://github.com/spdx/spdx-spec/blob/v2.3/schemas/spdx-schema.json) | ✅ valid |
+
+### Ingestion by other tools
+
+| Tool | Command | Result |
+|---|---|---|
+| Syft 1.55.0 | `syft convert app.cdx.json -o spdx-json=out.spdx.json` | ✅ ingested, re-emitted as SPDX 2.3 |
+| Syft 1.55.0 | `syft convert app.spdx.json -o cyclonedx-json=out.cdx.json` | ✅ ingested, all **66** components round-tripped |
+| Trivy 0.76.0 | `trivy sbom app.cdx.json` | ✅ detected as `cyclonedx-json`, **66/66 packages** ingested, scan completes |
+| Trivy 0.76.0 | `trivy sbom app.spdx.json` | ✅ detected as `spdx-json`, **66/66 packages** ingested, scan completes |
+
+Three independent implementations — **Syft**, **Trivy**, and **cyclonedx-npm** — all converge on the same 66 packages.
+
+### How it compares
+
+Same lockfile, same machine, every number measured locally:
+
+| | SnapSBOM 0.2.2 | Syft 1.55.0 | [`@cyclonedx/cyclonedx-npm`](https://github.com/CycloneDX/cyclonedx-npm) 6.0.1 |
+|---|---|---|---|
+| Reads | `package-lock.json` (v1–v3) only | files, dirs, container images, archives | `package-lock.json` + installed `node_modules` |
+| Emits | SPDX 2.3 **and** CycloneDX 1.6 | SPDX 2.2/2.3, CycloneDX, Syft JSON | CycloneDX only |
+| Packages on this fixture | **66** | 68 (the 66 + the scanned project + the lockfile file itself) | **66** |
+| Byte-identical on re-run | ✅ always | ❌ `metadata.timestamp` churns | ❌ by default; ✅ with `--output-reproducible`, which drops the timestamp *and* serial number |
+| `created` / `timestamp` | pinned to `2026-01-01T00:00:00Z` | wall clock | wall clock (or removed entirely) |
+| Works offline, no install | ✅ lockfile only | ✅ for directory scans | ❌ requires an installed `node_modules` (invokes `npm`) |
+
+The strongest signal a format can offer is **two independent implementations agreeing**. SnapSBOM and `@cyclonedx/cyclonedx-npm` produce the *same 66 packages and byte-identical purls* on this fixture:
+
+```bash
+$ python3 - <<'EOF'
+import json
+ours  = {(c['name'], c['version'], c['purl']) for c in json.load(open('app.cdx.json'))['components']}
+theirs= {(c['name'], c['version'], c['purl']) for c in json.load(open('cdxnpm.json'))['components']}
+print('identical package sets:', ours == theirs)
+print('purl differences:', len(ours ^ theirs))
+EOF
+identical package sets: True
+purl differences: 0
+```
+
+### Reproduce every number above
+
+```bash
+# 0. the fixture
+mkdir fixture && (cd fixture && npm init -y && npm install express react)
+
+# 1. SnapSBOM output, both formats
+snapsbom fixture --format cyclonedx --output app.cdx.json
+snapsbom fixture --format spdx      --output app.spdx.json
+
+# 2. schema validation against the official specs
+#    (rewrite each schema's $id to its local filename first,
+#     so ajv's -r can resolve the refs)
+npx ajv-cli@5 validate -s bom-1.6.schema.json -r spdx.schema.json -r jsf-0.82.schema.json \
+  -d app.cdx.json --spec=draft7 --strict=false --validate-formats=false
+npx ajv-cli@5 validate -s spdx-schema.json \
+  -d app.spdx.json --spec=draft7 --strict=false --validate-formats=false
+
+# 3. ingestion by an independent implementation
+syft convert app.cdx.json  -o spdx-json=from-cdx.spdx.json
+syft convert app.spdx.json -o cyclonedx-json=from-spdx.cdx.json
+
+# 4. determinism — run twice, diff must be empty
+snapsbom fixture --format cyclonedx --output run1.json
+snapsbom fixture --format cyclonedx --output run2.json
+diff run1.json run2.json && echo "byte-identical"
+
+# 5. cross-check against an independent implementation (compare with the
+#    python snippet above — identical package sets, zero purl differences)
+npx @cyclonedx/cyclonedx-npm -o cdxnpm.json --of JSON --sv 1.6 fixture/package.json
+
+# 6. vulnerability scanning by an independent implementation
+#    (trivy downloads its vulnerability DB on first run)
+trivy sbom app.cdx.json
+trivy sbom app.spdx.json
+```
 
 ---
 
