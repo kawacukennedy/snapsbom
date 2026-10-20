@@ -1,6 +1,6 @@
 use clap::{Parser, ValueEnum};
-use snapsbom::{generate_from_path, Format};
-use std::path::PathBuf;
+use snapsbom::{cyclonedx, det, npm, spdx, Format};
+use std::path::{Path, PathBuf};
 
 #[derive(Parser, Debug)]
 #[command(name = "snapsbom", about = "Deterministic SBOM generator", version)]
@@ -28,15 +28,50 @@ impl From<Fmt> for Format {
     }
 }
 
+/// Turn the user's argument into a concrete lockfile path.
+///
+/// Failing here with a message that says what to do next beats letting
+/// `read` surface a bare "Is a directory (os error 21)".
+fn resolve_lockfile(input: &Path) -> anyhow::Result<PathBuf> {
+    if input.is_dir() {
+        let candidate = input.join("package-lock.json");
+        if candidate.exists() {
+            return Ok(candidate);
+        }
+        return Err(anyhow::anyhow!(
+            "no package-lock.json found in {}\n\n  SnapSBOM reads npm lockfiles, so either:\n    * pass a directory that contains package-lock.json\n    * or pass the file directly: snapsbom path/to/package-lock.json",
+            input.display()
+        ));
+    }
+    if !input.exists() {
+        return Err(anyhow::anyhow!(
+            "{} does not exist",
+            input.display()
+        ));
+    }
+    Ok(input.to_path_buf())
+}
+
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
-    let p = if args.path.is_dir() {
-        let candidate = args.path.join("package-lock.json");
-        if candidate.exists() { candidate } else { args.path.clone() }
-    } else {
-        args.path.clone()
+    let p = resolve_lockfile(&args.path)?;
+
+    let comps = npm::parse_package_lock(&p)?;
+    if comps.is_empty() {
+        // Never fail silently on a zero-package SBOM - that is exactly the
+        // mistake a CI integration would not notice.
+        eprintln!(
+            "warning: {} yielded 0 packages - the SBOM will be empty",
+            p.display()
+        );
+    }
+
+    let v = match args.format.into() {
+        Format::Spdx => spdx::components_to_spdx(&comps),
+        Format::Cyclonedx => cyclonedx::components_to_cyclonedx(&comps),
     };
-    let out = generate_from_path(&p, args.format.into())?;
+    let out = det::to_deterministic_json(&v)?;
+
     match args.output {
         Some(f) => std::fs::write(f, out)?,
         None => print!("{}", out),
