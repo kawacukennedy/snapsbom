@@ -8,6 +8,7 @@
 
 [![npm version](https://img.shields.io/npm/v/snapsbom?color=41e3ff&label=npm)](https://www.npmjs.com/package/snapsbom)
 [![npm downloads](https://img.shields.io/npm/dm/snapsbom?color=5b7cff)](https://www.npmjs.com/package/snapsbom)
+[![crates.io](https://img.shields.io/crates/v/snapsbom?color=f74c00&label=crates.io)](https://crates.io/crates/snapsbom)
 [![CI](https://img.shields.io/github/actions/workflow/status/kawacukennedy/snapsbom/ci.yml?branch=main&label=CI)](https://github.com/kawacukennedy/snapsbom/actions)
 [![License: MIT](https://img.shields.io/badge/license-MIT-39e1a3.svg)](./LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-9d7bff.svg)](./CONTRIBUTING.md)
@@ -70,8 +71,9 @@ Prefer a persistent install?
 npm install -g snapsbom
 snapsbom .
 
-# …or build the CLI from source
-cargo install --path .   # after cloning this repo
+# …or from crates.io
+cargo install snapsbom
+snapsbom .
 ```
 
 Point it at a directory (it finds `package-lock.json` automatically) or straight at a lockfile:
