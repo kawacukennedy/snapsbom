@@ -73,3 +73,38 @@ fn npm_metadata_matches_crate_version() {
         );
     }
 }
+
+/// The npm launcher is plain CommonJS, but `engines` is the only signal a
+/// legacy Node install gets before the platform binary resolves — and it has
+/// silently gone missing before (0.1.0 shipped without it). Pin the contract:
+/// the field must exist, be a lower bound, and never understate what the
+/// launcher actually needs.
+#[test]
+fn npm_package_declares_node_engines() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let text = fs::read_to_string(root.join("package.json")).expect("cannot read package.json");
+    let main: serde_json::Value =
+        serde_json::from_str(&text).expect("package.json is not valid JSON");
+
+    let node = main["engines"]["node"]
+        .as_str()
+        .expect("package.json must declare engines.node, e.g. \"engines\": { \"node\": \">=16\" }");
+
+    assert!(
+        node.starts_with(">="),
+        "engines.node must be a lower bound (>=X), got {node:?}"
+    );
+
+    // The launcher's only syntax newer than ES2017 is `??` (Node 14+), so a
+    // floor below 14 would be a false promise to users on older runtimes.
+    let floor: u32 = node
+        .trim_start_matches(">=")
+        .split('.')
+        .next()
+        .and_then(|major| major.parse().ok())
+        .unwrap_or_else(|| panic!("cannot parse a Node major version out of {node:?}"));
+    assert!(
+        floor >= 14,
+        "engines.node {node:?} understates the launcher's requirements (it needs >=14)"
+    );
+}
