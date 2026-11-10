@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="snapsbom-mark-title">
   <title id="snapsbom-mark-title">SnapSBOM</title>
   <defs>
-    <linearGradient id="sb-mark-trace" x1="88" y1="80" x2="168" y2="176" gradientUnits="userSpaceOnUse">
+    <linearGradient id="sb-mark-trace" x1="168" y1="80" x2="88" y2="176" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#41E3FF"/>
       <stop offset=".5" stop-color="#5B7CFF"/>
       <stop offset="1" stop-color="#9D7BFF"/>
     </linearGradient>
   </defs>
-  <path d="M88 80h80v48H88v48h80" fill="none" stroke="url(#sb-mark-trace)" stroke-width="30"
+  <path d="M168 80h-80v48H168v48h-80" fill="none" stroke="url(#sb-mark-trace)" stroke-width="30"
         stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="88" cy="80" r="12" fill="#39E1A3"/>
-  <circle cx="168" cy="176" r="12" fill="#39E1A3"/>
+  <circle cx="168" cy="80" r="12" fill="#39E1A3"/>
+  <circle cx="88" cy="176" r="12" fill="#39E1A3"/>
 </svg>
