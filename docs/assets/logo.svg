@@ -6,7 +6,7 @@
       <stop offset=".55" stop-color="#0C1530"/>
       <stop offset="1" stop-color="#070B16"/>
     </linearGradient>
-    <linearGradient id="sb-trace" x1="88" y1="80" x2="168" y2="176" gradientUnits="userSpaceOnUse">
+    <linearGradient id="sb-trace" x1="168" y1="80" x2="88" y2="176" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#41E3FF"/>
       <stop offset=".5" stop-color="#5B7CFF"/>
       <stop offset="1" stop-color="#9D7BFF"/>
@@ -22,8 +22,8 @@
     <rect width="256" height="256" fill="url(#sb-gloss)"/>
   </g>
   <rect x="1.5" y="1.5" width="253" height="253" rx="56.5" fill="none" stroke="#FFFFFF" stroke-opacity=".10" stroke-width="1.5"/>
-  <path d="M88 80h80v48H88v48h80" fill="none" stroke="url(#sb-trace)" stroke-width="30"
+  <path d="M168 80h-80v48H168v48h-80" fill="none" stroke="url(#sb-trace)" stroke-width="30"
         stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="88" cy="80" r="12" fill="#39E1A3"/>
-  <circle cx="168" cy="176" r="12" fill="#39E1A3"/>
+  <circle cx="168" cy="80" r="12" fill="#39E1A3"/>
+  <circle cx="88" cy="176" r="12" fill="#39E1A3"/>
 </svg>
