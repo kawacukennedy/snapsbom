@@ -48,6 +48,8 @@ const binary = resolveBinary();
 
 if (!binary) {
   const lines = [
+    "SnapSBOM — deterministic SBOMs in milliseconds.",
+    "",
     `snapsbom: no prebuilt binary was found for ${platform}-${arch}.`,
     "",
     `This usually means the optional dependency "${pkg}" was skipped.`,
@@ -56,6 +58,8 @@ if (!binary) {
     "Fix it with either:",
     `  • npm install ${pkg}`,
     "  • cargo install --git https://github.com/kawacukennedy/snapsbom",
+    "",
+    "Docs: https://kawacukennedy.github.io/snapsbom/",
     "",
   ];
   process.stderr.write(lines.join("\n"));
