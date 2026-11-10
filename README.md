@@ -48,7 +48,7 @@ SnapSBOM takes the opposite approach. It **reads your lockfile directly** and em
 
 ```console
 $ npx snapsbom .
-✔ Wrote SPDX 2.3 · 7 components · 3 ms
+Wrote SPDX 2.3 · 7 components · 3 ms
 ```
 
 > **Same lockfile in, same bytes out — on any machine, any day.** That is what makes an SBOM *verifiable* instead of merely *present*.
@@ -56,7 +56,7 @@ $ npx snapsbom .
 ---
 
 <a id="quick-start"></a>
-## ⚡ Quick start
+## Quick start
 
 No install required:
 
@@ -85,30 +85,30 @@ snapsbom ./my-app/package-lock.json
 
 ---
 
-## ✨ Features
+## Features
 
 | | |
 |---|---|
-| **🎯 Deterministic by design** | Fixed timestamps, sorted keys, canonical package IDs and ordering. Identical input → identical bytes, forever. |
-| **🔒 Truly local-first** | Zero network calls. Zero telemetry. Runs offline, in CI, and in air-gapped environments. |
-| **⚙️ One core, two runtimes** | The same Rust core powers the CLI and the browser (WASM) playground — so both agree exactly. |
-| **📦 Standards compliant** | Emits [SPDX 2.3](https://spdx.github.io/spdx-spec/v2.3/) and [CycloneDX 1.6](https://cyclonedx.org/specification/overview/) JSON. |
-| **🚀 Fast & dependency-light** | Parses lockfiles directly — no source scan, no container, no Docker. Milliseconds, not minutes. |
-| **🧩 Tiny surface** | A single static binary (or a `npx` one-liner). Nothing to configure to get a valid SBOM. |
+| **Deterministic by design** | Fixed timestamps, sorted keys, canonical package IDs and ordering. Identical input → identical bytes, forever. |
+| **Truly local-first** | Zero network calls. Zero telemetry. Runs offline, in CI, and in air-gapped environments. |
+| **One core, two runtimes** | The same Rust core powers the CLI and the browser (WASM) playground — so both agree exactly. |
+| **Standards compliant** | Emits [SPDX 2.3](https://spdx.github.io/spdx-spec/v2.3/) and [CycloneDX 1.6](https://cyclonedx.org/specification/overview/) JSON. |
+| **Fast & dependency-light** | Parses lockfiles directly — no source scan, no container, no Docker. Milliseconds, not minutes. |
+| **Tiny surface** | A single static binary (or a `npx` one-liner). Nothing to configure to get a valid SBOM. |
 
 ---
 
 <a id="determinism"></a>
-## 🔬 Why determinism matters
+## Why determinism matters
 
 A normal SBOM generator stamps the current time, walks the filesystem in an arbitrary order, and assigns random IDs. Run it twice and you get two different files — so you cannot tell whether a change in the diff is a **real dependency change** or just noise. That makes review, diffing, and attestation painful.
 
 SnapSBOM produces a **canonical** document instead:
 
-- 🕒 `created` is pinned to a fixed epoch (`2026-01-01T00:00:00Z`), not “now”.
-- 🔢 Packages are **deduplicated by purl and sorted**, so `SPDXRef-Package-1…N` are stable and predictable.
-- 🔑 Keys are emitted in a stable order, so line-level diffs are meaningful.
-- 🧾 The `documentNamespace` is stable, so the document identity doesn’t churn.
+- `created` is pinned to a fixed epoch (`2026-01-01T00:00:00Z`), not “now”.
+- Packages are **deduplicated by purl and sorted**, so `SPDXRef-Package-1…N` are stable and predictable.
+- Keys are emitted in a stable order, so line-level diffs are meaningful.
+- The `documentNamespace` is stable, so the document identity doesn’t churn.
 
 The result: you can commit an SBOM next to the lockfile and **`git diff` it like any other file**. Verification becomes a string comparison.
 
@@ -126,7 +126,7 @@ ff8584cdc321a348c94c9d8e139149556ab8b895d8b83da68e41013fe38c7689  -
 
 ---
 
-## 📤 Output formats
+## Output formats
 
 ### SPDX 2.3 (default)
 
@@ -212,7 +212,7 @@ snapsbom . --format cyclonedx
 ---
 
 <a id="cli-reference"></a>
-## 🧰 CLI reference
+## CLI reference
 
 ```text
 Deterministic SBOM generator
@@ -261,21 +261,21 @@ Reads npm lockfiles (v1 / v2 / v3). No network. Byte-for-byte reproducible.
 
 ---
 
-## 🗂️ Supported inputs
+## Supported inputs
 
 | Ecosystem | Lockfile | Status |
 |---|---|---|
-| **npm** | `package-lock.json` (v1 / v2 / v3) | ✅ Supported |
-| pnpm | `pnpm-lock.yaml` | 🛣️ Roadmap |
-| Yarn | `yarn.lock` | 🛣️ Roadmap |
-| Python | `poetry.lock`, `requirements.txt` | 🛣️ Roadmap |
-| Cargo | `Cargo.lock` | 🛣️ Roadmap |
+| **npm** | `package-lock.json` (v1 / v2 / v3) | Supported |
+| pnpm | `pnpm-lock.yaml` |  Roadmap |
+| Yarn | `yarn.lock` |  Roadmap |
+| Python | `poetry.lock`, `requirements.txt` |  Roadmap |
+| Cargo | `Cargo.lock` |  Roadmap |
 
 SnapSBOM is intentionally **honest about scope**: it currently guarantees correctness for npm lockfiles, and grows one ecosystem at a time. PRs for new parsers are very welcome — the parser plug-in point lives in [`src/npm.rs`](./src/npm.rs).
 
 ---
 
-## 🌐 Interoperability
+## Interoperability
 
 A deterministic SBOM is only useful if the rest of your toolchain can read it. SnapSBOM's output is verified against the **official specifications** and against **independent implementations** — never just against itself.
 
@@ -285,17 +285,17 @@ Everything below was measured on one fixture: a real `npm install express react`
 
 | Output | Validator | Result |
 |---|---|---|
-| CycloneDX 1.6 | `ajv` vs the official [`bom-1.6.schema.json`](https://github.com/CycloneDX/specification/blob/master/schema/bom-1.6.schema.json) (with its `spdx` + `jsf` refs) | ✅ valid |
-| SPDX 2.3 | `ajv` vs the official [`spdx-schema.json`](https://github.com/spdx/spdx-spec/blob/v2.3/schemas/spdx-schema.json) | ✅ valid |
+| CycloneDX 1.6 | `ajv` vs the official [`bom-1.6.schema.json`](https://github.com/CycloneDX/specification/blob/master/schema/bom-1.6.schema.json) (with its `spdx` + `jsf` refs) |  valid |
+| SPDX 2.3 | `ajv` vs the official [`spdx-schema.json`](https://github.com/spdx/spdx-spec/blob/v2.3/schemas/spdx-schema.json) |  valid |
 
 ### Ingestion by other tools
 
 | Tool | Command | Result |
 |---|---|---|
-| Syft 1.55.0 | `syft convert app.cdx.json -o spdx-json=out.spdx.json` | ✅ ingested, re-emitted as SPDX 2.3 |
-| Syft 1.55.0 | `syft convert app.spdx.json -o cyclonedx-json=out.cdx.json` | ✅ ingested, all **66** components round-tripped |
-| Trivy 0.76.0 | `trivy sbom app.cdx.json` | ✅ detected as `cyclonedx-json`, **66/66 packages** ingested, scan completes |
-| Trivy 0.76.0 | `trivy sbom app.spdx.json` | ✅ detected as `spdx-json`, **66/66 packages** ingested, scan completes |
+| Syft 1.55.0 | `syft convert app.cdx.json -o spdx-json=out.spdx.json` | ingested, re-emitted as SPDX 2.3 |
+| Syft 1.55.0 | `syft convert app.spdx.json -o cyclonedx-json=out.cdx.json` | ingested, all **66** components round-tripped |
+| Trivy 0.76.0 | `trivy sbom app.cdx.json` | detected as `cyclonedx-json`, **66/66 packages** ingested, scan completes |
+| Trivy 0.76.0 | `trivy sbom app.spdx.json` | detected as `spdx-json`, **66/66 packages** ingested, scan completes |
 
 Three independent implementations — **Syft**, **Trivy**, and **cyclonedx-npm** — all converge on the same 66 packages.
 
@@ -308,9 +308,9 @@ Same lockfile, same machine, every number measured locally:
 | Reads | `package-lock.json` (v1–v3) only | files, dirs, container images, archives | `package-lock.json` + installed `node_modules` |
 | Emits | SPDX 2.3 **and** CycloneDX 1.6 | SPDX 2.2/2.3, CycloneDX, Syft JSON | CycloneDX only |
 | Packages on this fixture | **66** | 68 (the 66 + the scanned project + the lockfile file itself) | **66** |
-| Byte-identical on re-run | ✅ always | ❌ `metadata.timestamp` churns | ❌ by default; ✅ with `--output-reproducible`, which drops the timestamp *and* serial number |
+| Byte-identical on re-run |  always |  `metadata.timestamp` churns |  by default;  with `--output-reproducible`, which drops the timestamp *and* serial number |
 | `created` / `timestamp` | pinned to `2026-01-01T00:00:00Z` | wall clock | wall clock (or removed entirely) |
-| Works offline, no install | ✅ lockfile only | ✅ for directory scans | ❌ requires an installed `node_modules` (invokes `npm`) |
+| Works offline, no install |  lockfile only |  for directory scans |  requires an installed `node_modules` (invokes `npm`) |
 
 The strongest signal a format can offer is **two independent implementations agreeing**. SnapSBOM and `@cyclonedx/cyclonedx-npm` produce the *same 66 packages and byte-identical purls* on this fixture:
 
@@ -365,7 +365,7 @@ trivy sbom app.spdx.json
 
 ---
 
-## 🏗️ How it works
+## How it works
 
 ```
         package-lock.json
@@ -398,7 +398,7 @@ Because both share the same core, the browser and the terminal produce identical
 
 ---
 
-## 🔄 Use it in CI
+## Use it in CI
 
 Generate an SBOM as a build artifact — no secrets, no network, no external service:
 
@@ -426,7 +426,7 @@ jobs:
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome — new lockfile parsers, emitter tweaks, docs, and tests especially.
 
@@ -437,10 +437,10 @@ Contributions are welcome — new lockfile parsers, emitter tweaks, docs, and te
 
 ---
 
-## 📄 License
+## License
 
 MIT — see [`LICENSE`](./LICENSE).
 
 <div align="center">
-  <sub>Built with 🦀 Rust. No cloud. No telemetry. No nonsense.</sub>
+  <sub>Built with Rust. No cloud. No telemetry. No nonsense.</sub>
 </div>
