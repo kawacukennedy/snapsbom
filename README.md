@@ -217,16 +217,39 @@ snapsbom . --format cyclonedx
 ```text
 Deterministic SBOM generator
 
+Reads an npm package-lock.json and writes SPDX 2.3 or CycloneDX 1.6 JSON.
+Everything runs locally: no network, no telemetry, and the same input
+always produces byte-for-byte identical output.
+
 Usage: snapsbom [OPTIONS] <PATH>
 
 Arguments:
-  <PATH>  Path to lockfile (e.g. package-lock.json) or directory
+  <PATH>
+          Lockfile or a directory containing package-lock.json
 
 Options:
-      --format <FORMAT>  [default: spdx] [possible values: spdx, cyclonedx]
-      --output <OUTPUT>  Output file (stdout if not specified)
-  -h, --help             Print help
-  -V, --version          Print version
+      --format <FORMAT>
+          Output format
+
+          [default: spdx]
+          [possible values: spdx, cyclonedx]
+
+      --output <FILE>
+          Write to a file instead of stdout
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version
+
+Examples:
+  snapsbom .                          SPDX 2.3 to stdout
+  snapsbom . --format cyclonedx       CycloneDX 1.6 to stdout
+  snapsbom . --output sbom.spdx.json  write to a file
+  snapsbom path/to/package-lock.json  analyse a specific lockfile
+
+Reads npm lockfiles (v1 / v2 / v3). No network. Byte-for-byte reproducible.
 ```
 
 | Command | What it does |

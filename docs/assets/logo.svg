@@ -1,29 +1,29 @@
-<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SnapSBOM">
-  <title>SnapSBOM</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="snapsbom-logo-title">
+  <title id="snapsbom-logo-title">SnapSBOM</title>
   <defs>
-    <linearGradient id="tile" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#152a52"/>
-      <stop offset="55%" stop-color="#0c1530"/>
-      <stop offset="100%" stop-color="#070b16"/>
+    <linearGradient id="sb-tile" x1="26" y1="8" x2="232" y2="248" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#18305B"/>
+      <stop offset=".55" stop-color="#0C1530"/>
+      <stop offset="1" stop-color="#070B16"/>
     </linearGradient>
-    <linearGradient id="trace" x1="70" y1="56" x2="188" y2="200" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#41e3ff"/>
-      <stop offset="50%" stop-color="#5b7cff"/>
-      <stop offset="100%" stop-color="#9d7bff"/>
+    <linearGradient id="sb-trace" x1="88" y1="80" x2="168" y2="176" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#41E3FF"/>
+      <stop offset=".5" stop-color="#5B7CFF"/>
+      <stop offset="1" stop-color="#9D7BFF"/>
     </linearGradient>
-    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="256" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.10"/>
-      <stop offset="42%" stop-color="#ffffff" stop-opacity="0"/>
+    <linearGradient id="sb-gloss" x1="0" y1="0" x2="0" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".09"/>
+      <stop offset=".46" stop-color="#FFFFFF" stop-opacity="0"/>
     </linearGradient>
-    <clipPath id="clip"><rect width="256" height="256" rx="60"/></clipPath>
+    <clipPath id="sb-clip"><rect width="256" height="256" rx="58"/></clipPath>
   </defs>
-  <g clip-path="url(#clip)">
-    <rect width="256" height="256" fill="url(#tile)"/>
-    <rect width="256" height="256" fill="url(#gloss)"/>
+  <g clip-path="url(#sb-clip)">
+    <rect width="256" height="256" fill="url(#sb-tile)"/>
+    <rect width="256" height="256" fill="url(#sb-gloss)"/>
   </g>
-  <rect x="1.25" y="1.25" width="253.5" height="253.5" rx="58.75" fill="none" stroke="#ffffff" stroke-opacity="0.09" stroke-width="1.5"/>
-  <path d="M170 82 H86 V128 H170 V174 H86" fill="none" stroke="url(#trace)"
-        stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="170" cy="82" r="10" fill="#39e1a3"/>
-  <circle cx="86" cy="174" r="10" fill="#39e1a3"/>
+  <rect x="1.5" y="1.5" width="253" height="253" rx="56.5" fill="none" stroke="#FFFFFF" stroke-opacity=".10" stroke-width="1.5"/>
+  <path d="M88 80h80v48H88v48h80" fill="none" stroke="url(#sb-trace)" stroke-width="30"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="88" cy="80" r="12" fill="#39E1A3"/>
+  <circle cx="168" cy="176" r="12" fill="#39E1A3"/>
 </svg>
