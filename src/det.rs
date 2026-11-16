@@ -89,3 +89,54 @@ fn json_cmp(a: &Value, b: &Value) -> std::cmp::Ordering {
         _ => Ordering::Equal,
     }
 }
+
+/// Pinned epoch used when `SOURCE_DATE_EPOCH` is unset or invalid.
+///
+/// Kept as the fallback so default output stays byte-identical across runs
+/// and machines (the reproducible-builds contract).
+pub const PINNED_EPOCH: &str = "2026-01-01T00:00:00Z";
+
+/// Timestamp emitted into generated SBOMs (`created` for SPDX, `metadata.timestamp`
+/// for CycloneDX).
+///
+/// Honours `SOURCE_DATE_EPOCH` (seconds since the Unix epoch) when it is set
+/// and parses cleanly, so a build can stamp a *true* but still reproducible
+/// timestamp. Falls back to `PINNED_EPOCH` otherwise, preserving the default
+/// byte-identical output.
+pub fn deterministic_timestamp() -> String {
+    match std::env::var("SOURCE_DATE_EPOCH") {
+        Ok(v) => match v.trim().parse::<u64>() {
+            Ok(secs) => epoch_to_rfc3339(secs),
+            Err(_) => PINNED_EPOCH.to_string(),
+        },
+        Err(_) => PINNED_EPOCH.to_string(),
+    }
+}
+
+/// Convert seconds since the Unix epoch to an RFC 3339 UTC timestamp.
+fn epoch_to_rfc3339(secs: u64) -> String {
+    let days = (secs / 86400) as i64;
+    let rem = secs % 86400;
+    let hour = rem / 3600;
+    let min = (rem % 3600) / 60;
+    let sec = rem % 60;
+
+    // Howard Hinnant's days_from_civil inverse: civil date from days since
+    // 1970-01-01.
+    let z = days + 719468;
+    let era = if z >= 0 { z } else { z - 146096 } / 146097;
+    let doe = z - era * 146097;
+    let yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
+    let mut y = yoe + era * 400;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let d = doy - (153 * mp + 2) / 5 + 1;
+    let m = if mp < 10 { mp + 3 } else { mp - 9 };
+    if m <= 2 {
+        y += 1;
+    }
+    format!(
+        "{:04}-{:02}-{:02}T{:02}:{:02}:{:02}Z",
+        y, m, d, hour, min, sec
+    )
+}

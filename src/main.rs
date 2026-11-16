@@ -42,6 +42,12 @@ struct Args {
 
     #[arg(long, value_name = "FILE", help = "Write to a file instead of stdout")]
     output: Option<PathBuf>,
+
+    #[arg(
+        long,
+        help = "Emit a CycloneDX serialNumber (unique per run; breaks byte-identical output). Only applies to --format cyclonedx"
+    )]
+    serial_number: bool,
 }
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
@@ -108,9 +114,14 @@ fn main() -> anyhow::Result<()> {
         );
     }
 
+    let serial = if args.serial_number {
+        Some(format!("urn:uuid:{}", uuid_v4()))
+    } else {
+        None
+    };
     let v = match args.format.into() {
         Format::Spdx => spdx::components_to_spdx(&comps),
-        Format::Cyclonedx => cyclonedx::components_to_cyclonedx(&comps),
+        Format::Cyclonedx => cyclonedx::components_to_cyclonedx_opts(&comps, serial),
     };
     let out = det::to_deterministic_json(&v)?;
 
@@ -129,4 +140,37 @@ fn main() -> anyhow::Result<()> {
         None => print!("{}", out),
     }
     Ok(())
+}
+
+/// Generate a (non-cryptographic) UUID v4 for opt-in CycloneDX serialNumbers.
+///
+/// Only used when `--serial-number` is passed, which is explicitly
+/// non-deterministic by design, so sourcing entropy from the wall clock and
+/// process id is acceptable here.
+fn uuid_v4() -> String {
+    use sha2::{Digest, Sha256};
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default();
+    let pid = std::process::id();
+    let mut hasher = Sha256::new();
+    hasher.update(now.as_nanos().to_le_bytes());
+    hasher.update(pid.to_le_bytes());
+    hasher.update(b"snapsbom-serial");
+    let hash = hasher.finalize();
+
+    let mut bytes = [0u8; 16];
+    bytes.copy_from_slice(&hash[..16]);
+    bytes[6] = (bytes[6] & 0x0f) | 0x40; // version 4
+    bytes[8] = (bytes[8] & 0x3f) | 0x80; // variant 10
+
+    format!(
+        "{:02x}{:02x}{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}",
+        bytes[0], bytes[1], bytes[2], bytes[3],
+        bytes[4], bytes[5], bytes[6], bytes[7],
+        bytes[8], bytes[9], bytes[10], bytes[11],
+        bytes[12], bytes[13], bytes[14], bytes[15]
+    )
 }

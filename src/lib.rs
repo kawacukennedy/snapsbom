@@ -16,10 +16,18 @@ pub enum Format {
 }
 
 pub fn generate_from_path(path: &Path, format: Format) -> anyhow::Result<String> {
+    generate_from_path_with_options(path, format, None)
+}
+
+pub fn generate_from_path_with_options(
+    path: &Path,
+    format: Format,
+    serial_number: Option<String>,
+) -> anyhow::Result<String> {
     let comps = npm::parse_package_lock(path)?;
     let v = match format {
         Format::Spdx => spdx::components_to_spdx(&comps),
-        Format::Cyclonedx => cyclonedx::components_to_cyclonedx(&comps),
+        Format::Cyclonedx => cyclonedx::components_to_cyclonedx_opts(&comps, serial_number),
     };
     det::to_deterministic_json(&v)
 }
