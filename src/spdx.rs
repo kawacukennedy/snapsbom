@@ -1,3 +1,4 @@
+use crate::det;
 use crate::model::Component;
 use serde_json::{json, Value};
 
@@ -42,7 +43,7 @@ pub fn components_to_spdx(components: &[Component]) -> Value {
     json!({
         "SPDXID": "SPDXRef-DOCUMENT",
         "creationInfo": {
-            "created": "2026-01-01T00:00:00Z",
+            "created": det::deterministic_timestamp(),
             "creators": ["Tool: SnapSBOM"]
         },
         "dataLicense": data_license(),

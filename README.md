@@ -105,12 +105,15 @@ A normal SBOM generator stamps the current time, walks the filesystem in an arbi
 
 SnapSBOM produces a **canonical** document instead:
 
-- `created` is pinned to a fixed epoch (`2026-01-01T00:00:00Z`), not “now”.
+- `created` (SPDX) / `metadata.timestamp` (CycloneDX) honours `SOURCE_DATE_EPOCH` when it is set, and otherwise falls back to a pinned epoch (`2026-01-01T00:00:00Z`) — never “now”. A fixed date is stable but not true; `SOURCE_DATE_EPOCH` is the reproducible-builds convention for stamping a timestamp that is both.
 - Packages are **deduplicated by purl and sorted**, so `SPDXRef-Package-1…N` are stable and predictable.
 - Keys are emitted in a stable order, so line-level diffs are meaningful.
 - The `documentNamespace` is stable, so the document identity doesn’t churn.
+- CycloneDX `serialNumber` is **omitted by default** (it would have to change on every run). Pass `--serial-number` to emit one — explicitly non-deterministic, for toolchains that require it (see [CycloneDX #474](https://github.com/CycloneDX/specification/issues/474)).
 
 The result: you can commit an SBOM next to the lockfile and **`git diff` it like any other file**. Verification becomes a string comparison.
+
+This matches the requirement set out in [Annex F of the publiccode-metadata procurement evidence requirements](https://codeberg.org/open-source-ecosystem/publiccode-metadata/src/branch/main/PROCUREMENT_EVIDENCE_REQUIREMENTS.md#annex-f-generating-an-sbom-twice-must-give-the-same-file): *generating an SBOM twice from the same release gives a byte-identical file*, so a buyer can record the digest it evaluated and still match it later.
 
 <div align="center">
   <img src="docs/assets/determinism.gif" alt="Running SnapSBOM twice produces identical SHA-256 output" width="820" />
@@ -237,6 +240,10 @@ Options:
       --output <FILE>
           Write to a file instead of stdout
 
+      --serial-number
+          Emit a CycloneDX serialNumber (unique per run; breaks byte-identical output).
+          Only applies to --format cyclonedx
+
   -h, --help
           Print help (see a summary with '-h')
 
@@ -257,6 +264,7 @@ Reads npm lockfiles (v1 / v2 / v3). No network. Byte-for-byte reproducible.
 | `snapsbom .` | Generate SPDX from `package-lock.json` in the current directory. |
 | `snapsbom . --format cyclonedx` | Generate a CycloneDX 1.6 document. |
 | `snapsbom . --output sbom.spdx.json` | Write to a file instead of stdout. |
+| `snapsbom . --format cyclonedx --serial-number` | Emit a CycloneDX document with a serialNumber (non-deterministic). |
 | `snapsbom path/to/package-lock.json` | Analyze a specific lockfile. |
 
 ---
