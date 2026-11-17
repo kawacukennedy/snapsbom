@@ -44,7 +44,7 @@
 
 [SBOMs](https://www.cisa.gov/sbom) are becoming mandatory — the **EU Cyber Resilience Act**, US executive orders, and enterprise procurement all expect them. Yet most SBOM tools are heavyweight scanners that require a build, a container, or a cloud upload, and that emit *different output every run*.
 
-SnapSBOM takes the opposite approach. It **reads your lockfile directly** and emits a standards-compliant SBOM in a few milliseconds, using a canonical, sorted, timestamp-pinned representation so the same input always produces **exactly the same bytes**.
+SnapSBOM takes the opposite approach. It **reads your lockfile directly** and emits a standards-compliant SBOM in a few milliseconds, using a canonical, sorted representation with a reproducible timestamp so the same input always produces **exactly the same bytes**.
 
 ```console
 $ npx snapsbom .
@@ -89,7 +89,7 @@ snapsbom ./my-app/package-lock.json
 
 | | |
 |---|---|
-| **Deterministic by design** | Fixed timestamps, sorted keys, canonical package IDs and ordering. Identical input → identical bytes, forever. |
+| **Deterministic by design** | Reproducible timestamps (`SOURCE_DATE_EPOCH`, else a pinned epoch), sorted keys, canonical package IDs and ordering. Identical input → identical bytes, forever. |
 | **Truly local-first** | Zero network calls. Zero telemetry. Runs offline, in CI, and in air-gapped environments. |
 | **One core, two runtimes** | The same Rust core powers the CLI and the browser (WASM) playground — so both agree exactly. |
 | **Standards compliant** | Emits [SPDX 2.3](https://spdx.github.io/spdx-spec/v2.3/) and [CycloneDX 1.6](https://cyclonedx.org/specification/overview/) JSON. |
@@ -317,7 +317,7 @@ Same lockfile, same machine, every number measured locally:
 | Emits | SPDX 2.3 **and** CycloneDX 1.6 | SPDX 2.2/2.3, CycloneDX, Syft JSON | CycloneDX only |
 | Packages on this fixture | **66** | 68 (the 66 + the scanned project + the lockfile file itself) | **66** |
 | Byte-identical on re-run |  always |  `metadata.timestamp` churns |  by default;  with `--output-reproducible`, which drops the timestamp *and* serial number |
-| `created` / `timestamp` | pinned to `2026-01-01T00:00:00Z` | wall clock | wall clock (or removed entirely) |
+| `created` / `timestamp` | honours `SOURCE_DATE_EPOCH`, else pinned | wall clock | wall clock (or removed entirely) |
 | Works offline, no install |  lockfile only |  for directory scans |  requires an installed `node_modules` (invokes `npm`) |
 
 The strongest signal a format can offer is **two independent implementations agreeing**. SnapSBOM and `@cyclonedx/cyclonedx-npm` produce the *same 66 packages and byte-identical purls* on this fixture:
